@@ -6,13 +6,13 @@ import Vapor
 public class SmtpClientService: Service {
 
     let connectTimeout: TimeAmount = TimeAmount.seconds(10)
-    let smtpServerConfiguration: SmtpServerConfiguration
+    let configuration: SmtpServerConfiguration
 
-    public init(configuration smtpServerConfiguration: SmtpServerConfiguration) {
-        self.smtpServerConfiguration = smtpServerConfiguration
+    public init(configuration: SmtpServerConfiguration) {
+        self.configuration = configuration
     }
 
-    public func send(_ email: Email, on worker: Worker, logHandler: ((String) -> Void)? = nil) throws -> Future<Result<Bool, Error>> {
+    public func send(_ email: Email, on worker: Worker, logHandler: ((String) -> Void)? = nil) -> Future<Result<Bool, Error>> {
 
         let emailSentPromise: EventLoopPromise<Void> = worker.eventLoop.newPromise()
 
@@ -22,15 +22,15 @@ public class SmtpClientService: Service {
             .channelOption(ChannelOptions.socket(SocketOptionLevel(SOL_SOCKET), SO_REUSEADDR), value: 1)
             .channelInitializer { channel in
 
-                return self.smtpServerConfiguration.secure.configureChannel(on: channel,
-                                                                            hostname: self.smtpServerConfiguration.hostname).then {
+                let secureChannelFuture = self.configuration.secure.configureChannel(on: channel, hostname: self.configuration.hostname)
+                return secureChannelFuture.then {
 
                     let defaultHandlers: [ChannelHandler] = [
                         DuplexMessagesHandler(handler: logHandler),
                         InboundLineBasedFrameDecoder(),
                         InboundSmtpResponseDecoder(),
                         OutboundSmtpRequestEncoder(),
-                        InboundSendEmailHandler(configuration: self.smtpServerConfiguration,
+                        InboundSendEmailHandler(configuration: self.configuration,
                                                 email: email,
                                                 allDonePromise: emailSentPromise)
                     ]
@@ -40,8 +40,7 @@ public class SmtpClientService: Service {
             }
 
         // Connect and send email.
-        let connection = bootstrap.connect(host: smtpServerConfiguration.hostname,
-                                           port: smtpServerConfiguration.port)
+        let connection = bootstrap.connect(host: configuration.hostname, port: configuration.port)
 
         connection.cascadeFailure(promise: emailSentPromise)
 

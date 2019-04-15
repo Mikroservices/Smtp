@@ -16,7 +16,6 @@ public enum SmtpSecureChannel {
             } catch {
                 return Future.done(on: channel.eventLoop)
             }
-
         default:
             return Future.done(on: channel.eventLoop)
         }
