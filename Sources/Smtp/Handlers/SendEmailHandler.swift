@@ -1,4 +1,5 @@
 import NIO
+import NIOOpenSSL
 
 internal final class SendEmailHandler: ChannelInboundHandler {
     typealias InboundIn = SmtpResponse
@@ -8,6 +9,7 @@ internal final class SendEmailHandler: ChannelInboundHandler {
     enum Expect {
         case initialMessageFromServer
         case okForOurHello
+        case okForOurStartTLS
         case okForOurAuthBegin
         case okAfterUsername
         case okAfterPassword
@@ -53,6 +55,9 @@ internal final class SendEmailHandler: ChannelInboundHandler {
         case .okForOurHello:
             self.send(ctx: ctx, command: .beginAuthentication)
             self.currentlyWaitingFor = .okForOurAuthBegin
+        case .okForOurStartTLS:
+            self.send(ctx: ctx, command: .beginAuthentication)
+            self.currentlyWaitingFor = .okForOurAuthBegin
         case .okForOurAuthBegin:
             self.send(ctx: ctx, command: .authUser(self.serverConfiguration.username))
             self.currentlyWaitingFor = .okAfterUsername
@@ -60,10 +65,10 @@ internal final class SendEmailHandler: ChannelInboundHandler {
             self.send(ctx: ctx, command: .authPassword(self.serverConfiguration.password))
             self.currentlyWaitingFor = .okAfterPassword
         case .okAfterPassword:
-            self.send(ctx: ctx, command: .mailFrom(self.email.to))
+            self.send(ctx: ctx, command: .mailFrom(self.email.from))
             self.currentlyWaitingFor = .okAfterMailFrom
         case .okAfterMailFrom:
-            self.send(ctx: ctx, command: .recipient(self.email.from))
+            self.send(ctx: ctx, command: .recipient(self.email.to))
             self.currentlyWaitingFor = .okAfterRecipient
         case .okAfterRecipient:
             self.send(ctx: ctx, command: .data)

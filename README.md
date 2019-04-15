@@ -16,14 +16,15 @@ Features:
 - [x] Vapor provider/service
 - [x] SwiftNIO Support
 - [x] Text/HTML 
-- [ ] TLS/SSL
+- [x] SSL
+- [ ] TSL
 - [ ] Attachments
 - [ ] Multiple emails sent at the same time
 - [ ] Multiple recipient, CC & BCC fields
 
 ## Getting started
 
-Add the dependency to Package.swift:
+Add the dependency to `Package.swift`:
 
 ```swift
 .package(url: "https://github.com/Mikroservices/Smtp.git", from: "1.0.0")
@@ -35,7 +36,8 @@ Register the SMTP server configuration and the provider.
 let configuration = SmtpServerConfiguration(hostname: "smtp.server",
                                             port: 465,
                                             username: "johndoe",
-                                            password: "passw0rd")
+                                            password: "passw0rd",
+                                            secure: .ssl)
 
 services.register(configuration)
 try services.register(SmtpClientProvider())
@@ -63,3 +65,14 @@ smtpClientService.send(email, on: request).map { result in
 }
 ```
 
+## Troubleshoots
+
+You can use `logHandler` to handle and print all messages send/retrieved from email server.
+
+```swift
+smtpClientService.send(email, on: request) { message in
+    print(message)
+}.map { result in
+    ...
+}
+```

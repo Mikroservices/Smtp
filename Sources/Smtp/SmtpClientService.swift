@@ -5,14 +5,14 @@ import Vapor
 
 public class SmtpClientService: Service {
 
-    let connectTimeout: TimeAmount = TimeAmount.seconds(10)
+    let connectTimeout: TimeAmount = TimeAmount.seconds(30)
     let smtpServerConfiguration: SmtpServerConfiguration
 
     public init(configuration smtpServerConfiguration: SmtpServerConfiguration) {
         self.smtpServerConfiguration = smtpServerConfiguration
     }
 
-    public func send(_ email: Email, on worker: Worker) throws -> Future<Result<Bool, Error>> {
+    public func send(_ email: Email, on worker: Worker, logHandler: ((String) -> Void)? = nil) throws -> Future<Result<Bool, Error>> {
 
         let emailSentPromise: EventLoopPromise<Void> = worker.eventLoop.newPromise()
 
@@ -22,15 +22,21 @@ public class SmtpClientService: Service {
             .channelOption(ChannelOptions.socket(SocketOptionLevel(SOL_SOCKET), SO_REUSEADDR), value: 1)
             .channelInitializer { channel in
 
-                channel.pipeline.addHandlers([
-                    LineBasedFrameDecoder(),
-                    SmtpResponseDecoder(),
-                    SmtpRequestEncoder(),
-                    SendEmailHandler(configuration: self.smtpServerConfiguration,
-                                     email: email,
-                                     allDonePromise: emailSentPromise)
-                ], first: false)
+                return self.smtpServerConfiguration.secure.configureChannel(on: channel,
+                                                                            hostname: self.smtpServerConfiguration.hostname).then {
 
+                    let defaultHandlers: [ChannelHandler] = [
+                        PrintEverythingHandler(handler: logHandler),
+                        LineBasedFrameDecoder(),
+                        SmtpResponseDecoder(),
+                        SmtpRequestEncoder(),
+                        SendEmailHandler(configuration: self.smtpServerConfiguration,
+                                         email: email,
+                                         allDonePromise: emailSentPromise)
+                    ]
+
+                    return channel.pipeline.addHandlers(defaultHandlers, first: false)
+                }
             }
 
         // Connect and send email.
