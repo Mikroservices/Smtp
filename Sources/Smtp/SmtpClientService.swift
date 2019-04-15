@@ -8,10 +8,20 @@ public class SmtpClientService: Service {
     let connectTimeout: TimeAmount = TimeAmount.seconds(10)
     let configuration: SmtpServerConfiguration
 
+    /// Initialization of client.
+    ///
+    /// - parameters:
+    ///     - configuration: Email SMTP server configuration.
     public init(configuration: SmtpServerConfiguration) {
         self.configuration = configuration
     }
 
+    /// Sending an email.
+    ///
+    /// - parameters:
+    ///     - email: Email which will be send.
+    ///     - worker: EventLoop which will be used to send email.
+    /// - returns: An `Future<Result>` with information about sent email.
     public func send(_ email: Email, on worker: Worker, logHandler: ((String) -> Void)? = nil) -> Future<Result<Bool, Error>> {
 
         let emailSentPromise: EventLoopPromise<Void> = worker.eventLoop.newPromise()

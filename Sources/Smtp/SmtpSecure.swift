@@ -3,8 +3,15 @@ import NIO
 import NIOOpenSSL
 
 public enum SmtpSecureChannel {
+
+    /// Communication withiut any encryption (even password is send as a plain text).
     case none
+
+    /// Communication over SSL.
     case ssl
+
+    // SMTP Service Extension for Secure SMTP over Transport Layer Security: https://tools.ietf.org/html/rfc3207
+    // case tls
 
     internal func configureChannel(on channel: Channel, hostname: String) -> Future<Void> {
         switch self {
