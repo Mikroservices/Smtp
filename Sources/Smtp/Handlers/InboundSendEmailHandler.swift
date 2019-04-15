@@ -1,7 +1,7 @@
 import NIO
 import NIOOpenSSL
 
-internal final class SendEmailHandler: ChannelInboundHandler {
+internal final class InboundSendEmailHandler: ChannelInboundHandler {
     typealias InboundIn = SmtpResponse
     typealias OutboundIn = Email
     typealias OutboundOut = SmtpRequest

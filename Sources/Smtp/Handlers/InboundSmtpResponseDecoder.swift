@@ -1,6 +1,6 @@
 import NIO
 
-internal final class SmtpResponseDecoder: ChannelInboundHandler {
+internal final class InboundSmtpResponseDecoder: ChannelInboundHandler {
     typealias InboundIn = ByteBuffer
     typealias InboundOut = SmtpResponse
 

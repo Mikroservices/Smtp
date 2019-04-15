@@ -26,13 +26,13 @@ public class SmtpClientService: Service {
                                                                             hostname: self.smtpServerConfiguration.hostname).then {
 
                     let defaultHandlers: [ChannelHandler] = [
-                        PrintEverythingHandler(handler: logHandler),
-                        LineBasedFrameDecoder(),
-                        SmtpResponseDecoder(),
-                        SmtpRequestEncoder(),
-                        SendEmailHandler(configuration: self.smtpServerConfiguration,
-                                         email: email,
-                                         allDonePromise: emailSentPromise)
+                        DuplexMessagesHandler(handler: logHandler),
+                        InboundLineBasedFrameDecoder(),
+                        InboundSmtpResponseDecoder(),
+                        OutboundSmtpRequestEncoder(),
+                        InboundSendEmailHandler(configuration: self.smtpServerConfiguration,
+                                                email: email,
+                                                allDonePromise: emailSentPromise)
                     ]
 
                     return channel.pipeline.addHandlers(defaultHandlers, first: false)

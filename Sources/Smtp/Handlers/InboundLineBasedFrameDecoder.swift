@@ -9,14 +9,14 @@ import NIO
 ///     | AB | C\nDE | F\r\nGHI\n |
 ///     +----+-------+------------+
 ///
-/// A instance of `LineBasedFrameDecoder` will split this buffer
+/// A instance of `InboundLineBasedFrameDecoder` will split this buffer
 /// as follows:
 ///
 ///     +-----+-----+-----+
 ///     | ABC | DEF | GHI |
 ///     +-----+-----+-----+
 ///
-internal class LineBasedFrameDecoder: ByteToMessageDecoder {
+internal class InboundLineBasedFrameDecoder: ByteToMessageDecoder {
 
     public typealias InboundIn = ByteBuffer
     public typealias InboundOut = ByteBuffer

@@ -1,6 +1,6 @@
 import NIO
 
-internal final class PrintEverythingHandler: ChannelDuplexHandler {
+internal final class DuplexMessagesHandler: ChannelDuplexHandler {
     typealias InboundIn = ByteBuffer
     typealias InboundOut = ByteBuffer
     typealias OutboundIn = ByteBuffer
