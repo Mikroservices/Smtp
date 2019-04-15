@@ -2,8 +2,6 @@ import Vapor
 
 public final class SmtpClientProvider: Provider {
 
-    public init(){}
-
     public func boot(_ config: Config) throws {}
 
     public func didBoot(_ worker: Container) throws -> EventLoopFuture<Void> {

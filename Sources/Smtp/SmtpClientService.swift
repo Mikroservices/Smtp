@@ -5,7 +5,7 @@ import Vapor
 
 public class SmtpClientService: Service {
 
-    let connectTimeout: TimeAmount = TimeAmount.seconds(30)
+    let connectTimeout: TimeAmount = TimeAmount.seconds(10)
     let smtpServerConfiguration: SmtpServerConfiguration
 
     public init(configuration smtpServerConfiguration: SmtpServerConfiguration) {
@@ -42,6 +42,7 @@ public class SmtpClientService: Service {
         // Connect and send email.
         let connection = bootstrap.connect(host: smtpServerConfiguration.hostname,
                                            port: smtpServerConfiguration.port)
+
         connection.cascadeFailure(promise: emailSentPromise)
 
         return emailSentPromise.futureResult.map {

@@ -80,7 +80,7 @@ internal final class SendEmailHandler: ChannelInboundHandler {
             self.send(ctx: ctx, command: .quit)
             self.currentlyWaitingFor = .okAfterQuit
         case .okAfterQuit:
-            ctx.close(promise: self.allDonePromise)
+            self.allDonePromise.succeed()
             self.currentlyWaitingFor = .nothing
         case .nothing:
             () // ignoring more data whilst quit (it's odd though)
