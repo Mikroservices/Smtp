@@ -15,10 +15,10 @@ Features:
 
 - [x] Vapor provider/service
 - [x] SwiftNIO Support
-- [x] Text/HTML 
+- [x] Text/HTML
+- [x] Attachments
 - [x] SSL
 - [ ] TSL
-- [ ] Attachments
 - [ ] Multiple emails sent at the same time
 - [ ] Multiple recipient, CC & BCC fields
 
@@ -48,10 +48,8 @@ Using SMTP client.
 ```swift
 let smtpClientService = try app.make(SmtpClientService.self)
 
-let email = Email(from: "john.doe@testxx.com",
-                  fromName: "John Doe",
-                  to: "ben.doe@testxx.com",
-                  toName: "Ben Doe",
+let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
+                  to: EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe"),
                   subject: "The subject (text)",
                   body: "This is email body.")
 

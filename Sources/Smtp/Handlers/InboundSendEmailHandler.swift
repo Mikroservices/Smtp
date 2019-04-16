@@ -65,10 +65,10 @@ internal final class InboundSendEmailHandler: ChannelInboundHandler {
             self.send(ctx: ctx, command: .authPassword(self.serverConfiguration.password))
             self.currentlyWaitingFor = .okAfterPassword
         case .okAfterPassword:
-            self.send(ctx: ctx, command: .mailFrom(self.email.from))
+            self.send(ctx: ctx, command: .mailFrom(self.email.from.address))
             self.currentlyWaitingFor = .okAfterMailFrom
         case .okAfterMailFrom:
-            self.send(ctx: ctx, command: .recipient(self.email.to))
+            self.send(ctx: ctx, command: .recipient(self.email.to.address))
             self.currentlyWaitingFor = .okAfterRecipient
         case .okAfterRecipient:
             self.send(ctx: ctx, command: .data)

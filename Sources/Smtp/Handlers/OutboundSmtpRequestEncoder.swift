@@ -18,26 +18,7 @@ internal final class OutboundSmtpRequestEncoder: MessageToByteEncoder {
         case .data:
             out.write(string: "DATA")
         case .transferData(let email):
-            let date = Date()
-            let dateFormatter = DateFormatter()
-            dateFormatter.locale = Locale(identifier: "en_US")
-
-            dateFormatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss Z"
-            let dateFormatted = dateFormatter.string(from: date)
-
-            out.write(string: "From: \(formatMIME(emailAddress: email.from, name: email.fromName ?? email.from))\r\n")
-            out.write(string: "To: \(formatMIME(emailAddress: email.to, name: email.toName ?? email.to))\r\n")
-            out.write(string: "Date: \(dateFormatted)\r\n")
-            out.write(string: "Message-ID: <\(date.timeIntervalSince1970)\(email.from.drop { $0 != "@" })>\r\n")
-
-            if email.isBodyHtml {
-                out.write(string: "Content-Type: text/html; charset=\"UTF-8\"\r\n")
-                out.write(string: "Mime-Version: 1.0\r\n")
-            }
-
-            out.write(string: "Subject: \(email.subject)\r\n\r\n")
-            out.write(string: email.body)
-            out.write(string: "\r\n.")
+            email.write(to: &out)
         case .quit:
             out.write(string: "QUIT")
         case .beginAuthentication:
@@ -51,13 +32,5 @@ internal final class OutboundSmtpRequestEncoder: MessageToByteEncoder {
         }
 
         out.write(string: "\r\n")
-    }
-
-    func formatMIME(emailAddress: String, name: String?) -> String {
-        if let name = name {
-            return "\(name) <\(emailAddress)>"
-        } else {
-            return emailAddress
-        }
     }
 }

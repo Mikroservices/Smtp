@@ -4,7 +4,7 @@ import NIOOpenSSL
 
 public enum SmtpSecureChannel {
 
-    /// Communication withiut any encryption (even password is send as a plain text).
+    /// Communication without any encryption (even password is send as a plain text).
     case none
 
     /// Communication over SSL.

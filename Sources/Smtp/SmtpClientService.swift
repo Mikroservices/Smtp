@@ -3,6 +3,86 @@ import NIO
 import NIOOpenSSL
 import Vapor
 
+/// This is simple implementation of SMTP client service.
+/// The implementation was based on Apple SwiftNIO.
+///
+/// # Usage
+///
+/// **Register in Vapor**
+///
+///```swift
+/// let configuration = SmtpServerConfiguration(hostname: "smtp.server",
+///                                             port: 465,
+///                                             username: "johndoe",
+///                                             password: "passw0rd",
+///                                             secure: .ssl)
+///
+/// services.register(configuration)
+/// try services.register(SmtpClientProvider())
+///```
+///
+/// **Using SMTP client**
+///
+///```swift
+/// let smtpClientService = try app.make(SmtpClientService.self)
+///
+/// let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
+///                   to: EmailAddress("ben.doe@testxx.com"),
+///                   subject: "The subject (text)",
+///                   body: "This is email body.")
+///
+/// smtpClientService.send(email, on: request).map { result in
+///     switch result {
+///     case .success:
+///         print("Email has been sent")
+///     case .failure(let error):
+///         print("Email has not been sent: \(error)")
+///     }
+/// }
+///```
+///
+/// Channel pipeline:
+///
+/// ```
+/// +-------------------------------------------------------------------+
+/// |                                                                   |
+/// |       [ Socket.read ]                    [ Socket.write ]         |
+/// |              |                                  |                 |
+/// +--------------+----------------------------------+-----------------+
+///                |                                 /|\
+///               \|/                                 |
+///          +-----+----------------------------------+-----+
+///          |    OpenSSLClientHandler (enabled/disabled)   |
+///          +-----+----------------------------------+-----+
+///                |                                 /|\
+///               \|/                                 |
+///          +-----+----------------------------------+-----+
+///          |             DuplexMessagesHandler            |
+///          +-----+----------------------------------+-----+
+///                |                                 /|\
+///               \|/                                 |
+///          +-----+--------------------------+       |
+///          |  InboundLineBasedFrameDecoder  |       |
+///          +-----+--------------------------+       |
+///                |                                  |
+///               \|/                                 |
+///          +-----+--------------------------+       |
+///          |   InboundSmtpResponseDecoder   |       |
+///          +-----+--------------------------+       |
+///                |                                  |
+///                |                                  |
+///                |       +--------------------------+-----+
+///                |       |  OutboundSmtpRequestEncoder    |
+///                |       +--------------------------+-----+
+///                |                                 /|\
+///                |                                  |
+///               \|/                                 | [write]
+///          +-----+--------------------------+       |
+///          |   InboundSendEmailHandler      +-------+
+///          +--------------------------------+
+///```
+/// `OpenSSLClientHandler` is enabled only when `.ssl` secure is defined. For `.none` that
+/// handler is not added to the pipeline.
 public class SmtpClientService: Service {
 
     let connectTimeout: TimeAmount = TimeAmount.seconds(10)
