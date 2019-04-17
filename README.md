@@ -18,9 +18,11 @@ Features:
 - [x] Text/HTML
 - [x] Attachments
 - [x] SSL
-- [ ] TSL
+- [x] Multiple recipients & CC
+- [x] Reply to
 - [ ] Multiple emails sent at the same time
-- [ ] Multiple recipient, CC & BCC fields
+- [ ] BCC fields
+- [ ] TSL
 
 ## Getting started
 
@@ -49,7 +51,7 @@ Using SMTP client.
 let smtpClientService = try app.make(SmtpClientService.self)
 
 let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
-                  to: EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe"),
+                  to: [EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe")],
                   subject: "The subject (text)",
                   body: "This is email body.")
 

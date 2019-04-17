@@ -27,7 +27,7 @@ import Vapor
 /// let smtpClientService = try app.make(SmtpClientService.self)
 ///
 /// let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
-///                   to: EmailAddress("ben.doe@testxx.com"),
+///                   to: [EmailAddress("ben.doe@testxx.com")],
 ///                   subject: "The subject (text)",
 ///                   body: "This is email body.")
 ///

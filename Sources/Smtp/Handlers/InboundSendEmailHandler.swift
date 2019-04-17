@@ -27,11 +27,17 @@ internal final class InboundSendEmailHandler: ChannelInboundHandler {
     private let email: Email
     private let serverConfiguration: SmtpServerConfiguration
     private let allDonePromise: EventLoopPromise<Void>
+    private var recipients: [EmailAddress]
 
     init(configuration: SmtpServerConfiguration, email: Email, allDonePromise: EventLoopPromise<Void>) {
         self.email = email
         self.allDonePromise = allDonePromise
         self.serverConfiguration = configuration
+
+        self.recipients = self.email.to
+        if let cc = self.email.cc {
+            self.recipients += cc
+        }
     }
 
     func send(ctx: ChannelHandlerContext, command: SmtpRequest) {
@@ -68,8 +74,11 @@ internal final class InboundSendEmailHandler: ChannelInboundHandler {
             self.send(ctx: ctx, command: .mailFrom(self.email.from.address))
             self.currentlyWaitingFor = .okAfterMailFrom
         case .okAfterMailFrom:
-            self.send(ctx: ctx, command: .recipient(self.email.to.address))
-            self.currentlyWaitingFor = .okAfterRecipient
+            if let recipient = self.recipients.popLast() {
+                self.send(ctx: ctx, command: .recipient(recipient.address))
+            } else {
+                fallthrough
+            }
         case .okAfterRecipient:
             self.send(ctx: ctx, command: .data)
             self.currentlyWaitingFor = .okAfterDataCommand

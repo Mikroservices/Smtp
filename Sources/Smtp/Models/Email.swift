@@ -3,21 +3,23 @@ import NIO
 
 public struct Email {
     public let from: EmailAddress
-    public let to: EmailAddress
-    public let cc: [String]?
-    public let bcc: [String]?
+    public let to: [EmailAddress]
+    public let cc: [EmailAddress]?
+    public let bcc: [EmailAddress]?
     public let subject: String
     public let body: String
     public let isBodyHtml: Bool
+    public let replyTo: EmailAddress?
     internal var attachments: [Attachment] = []
 
     public init(from: EmailAddress,
-                to: EmailAddress,
-                cc: [String]? = nil,
-                bcc: [String]? = nil,
+                to: [EmailAddress],
+                cc: [EmailAddress]? = nil,
+                bcc: [EmailAddress]? = nil,
                 subject: String,
                 body: String,
-                isBodyHtml: Bool = false
+                isBodyHtml: Bool = false,
+                replyTo: EmailAddress? = nil
     ) {
         self.from = from
         self.to = to
@@ -26,6 +28,7 @@ public struct Email {
         self.subject = subject
         self.body = body
         self.isBodyHtml = isBodyHtml
+        self.replyTo = replyTo
     }
 
     public mutating func addAttachment(_ attachment: Attachment) {
@@ -43,7 +46,19 @@ extension Email {
         let dateFormatted = dateFormatter.string(from: date)
 
         out.write(string: "From: \(self.formatMIME(emailAddress: self.from))\r\n")
-        out.write(string: "To: \(self.formatMIME(emailAddress: self.to))\r\n")
+
+        let toAddresses = self.to.map { self.formatMIME(emailAddress: $0) }.joined(separator: ", ")
+        out.write(string: "To: \(toAddresses)\r\n")
+
+        if let cc = self.cc {
+            let ccAddresses = cc.map { self.formatMIME(emailAddress: $0) }.joined(separator: ", ")
+            out.write(string: "Cc: \(ccAddresses)\r\n")
+        }
+
+        if let replyTo = self.replyTo {
+            out.write(string: "Reply-to: \(self.formatMIME(emailAddress:replyTo))\r\n")
+        }
+
         out.write(string: "Subject: \(self.subject)\r\n")
         out.write(string: "Date: \(dateFormatted)\r\n")
         out.write(string: "Message-ID: <\(date.timeIntervalSince1970)\(self.from.address.drop { $0 != "@" })>\r\n")
