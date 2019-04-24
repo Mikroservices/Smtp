@@ -15,6 +15,12 @@ final class SmtpTests: XCTestCase {
                                                                                         password: "",
                                                                                         secure: .ssl))
 
+    let tslSmtpClientService = SmtpClientService(configuration: SmtpServerConfiguration(hostname: "smtp.gmail.com",
+                                                                                        port: 587,
+                                                                                        username: "",
+                                                                                        password: "",
+                                                                                        secure: .startTls))
+
     func testSendTextMessage() throws {
 
         let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
@@ -112,6 +118,22 @@ final class SmtpTests: XCTestCase {
         let worker = MultiThreadedEventLoopGroup(numberOfThreads: 1)
 
         try sslSmtpClientService.send(email, on: worker) { message in
+            print(message)
+        }.map { result in
+            XCTAssertTrue(try result.get())
+        }.wait()
+    }
+
+    func testSendTextMessageOverTSL() throws {
+
+        let email = Email(from: EmailAddress(address: "SENDER-EMAIL-TEST@gmail.com", name: "John Doe"),
+                          to: [EmailAddress(address: "RECIPIENT-EMAIL-TEST@icloud.com", name: "Ben Doe")],
+                          subject: "The subject (text)",
+                          body: "This is email body.")
+
+        let worker = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+
+        try tslSmtpClientService.send(email, on: worker) { message in
             print(message)
         }.map { result in
             XCTAssertTrue(try result.get())

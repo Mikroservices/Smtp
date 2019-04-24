@@ -3,14 +3,13 @@ import NIOOpenSSL
 
 internal final class InboundSendEmailHandler: ChannelInboundHandler {
     typealias InboundIn = SmtpResponse
-    typealias OutboundIn = Email
     typealias OutboundOut = SmtpRequest
 
     enum Expect {
         case initialMessageFromServer
-        case okForOurHello
-        case okForOurStartTLS
-        case okForOurAuthBegin
+        case okAfterHello
+        case okAfterStartTls
+        case okAfterAuthBegin
         case okAfterUsername
         case okAfterPassword
         case okAfterMailFrom
@@ -57,14 +56,21 @@ internal final class InboundSendEmailHandler: ChannelInboundHandler {
         switch self.currentlyWaitingFor {
         case .initialMessageFromServer:
             self.send(ctx: ctx, command: .sayHello(serverName: self.serverConfiguration.hostname))
-            self.currentlyWaitingFor = .okForOurHello
-        case .okForOurHello:
+            self.currentlyWaitingFor = .okAfterHello
+        case .okAfterHello:
+
+            if self.shouldInitializeTls() {
+                self.send(ctx: ctx, command: .startTls)
+                self.currentlyWaitingFor = .okAfterStartTls
+            } else {
+                self.send(ctx: ctx, command: .beginAuthentication)
+                self.currentlyWaitingFor = .okAfterAuthBegin
+            }
+
+        case .okAfterStartTls:
             self.send(ctx: ctx, command: .beginAuthentication)
-            self.currentlyWaitingFor = .okForOurAuthBegin
-        case .okForOurStartTLS:
-            self.send(ctx: ctx, command: .beginAuthentication)
-            self.currentlyWaitingFor = .okForOurAuthBegin
-        case .okForOurAuthBegin:
+            self.currentlyWaitingFor = .okAfterAuthBegin
+        case .okAfterAuthBegin:
             self.send(ctx: ctx, command: .authUser(self.serverConfiguration.username))
             self.currentlyWaitingFor = .okAfterUsername
         case .okAfterUsername:
@@ -96,5 +102,9 @@ internal final class InboundSendEmailHandler: ChannelInboundHandler {
         case .error:
             fatalError("error state")
         }
+    }
+
+    private func shouldInitializeTls() -> Bool {
+        return self.serverConfiguration.secure == .startTls || self.serverConfiguration.secure == .startTlsWhenAvailable
     }
 }

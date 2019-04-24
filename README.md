@@ -17,12 +17,12 @@ Features:
 - [x] SwiftNIO Support
 - [x] Text/HTML
 - [x] Attachments
-- [x] SSL
+- [x] SSL/TLS (when connection starts)
 - [x] Multiple recipients & CC
 - [x] Reply to
 - [ ] Multiple emails sent at the same time
 - [ ] BCC fields
-- [ ] TSL
+- [ ] STARTTSL support
 
 ## Getting started
 

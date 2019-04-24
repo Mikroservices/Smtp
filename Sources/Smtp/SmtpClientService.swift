@@ -120,6 +120,7 @@ public class SmtpClientService: Service {
                         InboundLineBasedFrameDecoder(),
                         InboundSmtpResponseDecoder(),
                         OutboundSmtpRequestEncoder(),
+                        StartTlsHandler(configuration: self.configuration, allDonePromise: emailSentPromise),
                         InboundSendEmailHandler(configuration: self.configuration,
                                                 email: email,
                                                 allDonePromise: emailSentPromise)
