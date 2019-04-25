@@ -29,10 +29,15 @@ internal final class StartTlsHandler: ChannelDuplexHandler {
             let result = self.unwrapInboundIn(data)
             switch result {
             case .error(let message):
-                // Fail only if tls is required.
                 if self.serverConfiguration.secure == .startTls {
+                    // Fail only if tls is required.
                     self.allDonePromise.fail(error: SmtpError(message))
+                    return
                 }
+
+                // Tls is not required, we can continue without encryption.
+                let startTlsResult = self.wrapInboundOut(.ok(200, "STARTTLS is not supported"))
+                ctx.fireChannelRead(startTlsResult)
                 return
             case .ok:
                 self.initializeTlsHandler(ctx: ctx, data: data)
