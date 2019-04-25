@@ -75,6 +75,11 @@ import Vapor
 ///                |       |  OutboundSmtpRequestEncoder    |
 ///                |       +--------------------------+-----+
 ///                |                                 /|\
+///               \|/                                 |
+///          +-----+----------------------------------+-----+
+///          |               StartTlsHandler                |
+///          +-----+----------------------------------+-----+
+///                |                                 /|\
 ///                |                                  |
 ///               \|/                                 | [write]
 ///          +-----+--------------------------+       |
@@ -83,6 +88,10 @@ import Vapor
 ///```
 /// `OpenSSLClientHandler` is enabled only when `.ssl` secure is defined. For `.none` that
 /// handler is not added to the pipeline.
+///
+/// `StartTlsHandler` is responsible for establishing SSL encryption after `STARTTLS`
+/// command (this handler adds dynamically `OpenSSLClientHandler` to the pipeline if
+/// server supports that encryption.
 public class SmtpClientService: Service {
 
     let connectTimeout: TimeAmount = TimeAmount.seconds(10)
@@ -120,6 +129,7 @@ public class SmtpClientService: Service {
                         InboundLineBasedFrameDecoder(),
                         InboundSmtpResponseDecoder(),
                         OutboundSmtpRequestEncoder(),
+                        StartTlsHandler(configuration: self.configuration, allDonePromise: emailSentPromise),
                         InboundSendEmailHandler(configuration: self.configuration,
                                                 email: email,
                                                 allDonePromise: emailSentPromise)

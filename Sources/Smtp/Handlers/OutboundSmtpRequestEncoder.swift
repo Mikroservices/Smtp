@@ -9,7 +9,7 @@ internal final class OutboundSmtpRequestEncoder: MessageToByteEncoder {
         switch data {
         case .sayHello(serverName: let server):
             out.write(string: "HELO \(server)")
-        case .startTLS:
+        case .startTls:
             out.write(string: "STARTTLS")
         case .mailFrom(let from):
             out.write(string: "MAIL FROM:<\(from)>")
