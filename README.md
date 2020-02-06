@@ -18,7 +18,7 @@ Features:
 - [x] Text/HTML
 - [x] Attachments
 - [x] SSL/TLS (when connection starts)
-- [x] STARTTSL support
+- [x] STARTTLS support
 - [x] Multiple recipients & CC
 - [x] Reply to
 - [ ] BCC fields
