@@ -1,5 +1,5 @@
 import NIO
-import NIOOpenSSL
+import NIOSSL
 
 internal final class StartTlsHandler: ChannelDuplexHandler {
     typealias InboundIn = SmtpResponse
@@ -31,7 +31,7 @@ internal final class StartTlsHandler: ChannelDuplexHandler {
             case .error(let message):
                 if self.serverConfiguration.secure == .startTls {
                     // Fail only if tls is required.
-                    self.allDonePromise.fail(error: SmtpError(message))
+                    self.allDonePromise.fail(SmtpError(message))
                     return
                 }
 
@@ -68,14 +68,14 @@ internal final class StartTlsHandler: ChannelDuplexHandler {
 
     private func initializeTlsHandler(ctx: ChannelHandlerContext, data: NIOAny) {
         do {
-            let sslContext = try SSLContext(configuration: .forClient())
-            let sslHandler = try OpenSSLClientHandler(context: sslContext, serverHostname: self.serverConfiguration.hostname)
-            _ = ctx.channel.pipeline.addHandlers(sslHandler, first: true)
+            let sslContext = try NIOSSLContext(configuration: .forClient())
+            let sslHandler = try NIOSSLClientHandler(context: sslContext, serverHostname: self.serverConfiguration.hostname)
+            _ = ctx.channel.pipeline.addHandler(sslHandler, name: "SSLHandler", position: .first)
 
             ctx.fireChannelRead(data)
-            _ = ctx.channel.pipeline.remove(handler: self)
+            _ = ctx.channel.pipeline.removeHandler(name: "SSLHandler")
         } catch let error {
-            self.allDonePromise.fail(error: error)
+            self.allDonePromise.fail(error)
         }
     }
 

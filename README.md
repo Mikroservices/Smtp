@@ -29,10 +29,10 @@ Features:
 Add the dependency to `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/Mikroservices/Smtp.git", from: "1.0.0")
+.package(url: "https://github.com/Mikroservices/Smtp.git", from: "2.0.0")
 ```
 
-Register the SMTP server configuration and the provider.
+Using SMTP client.
 
 ```swift
 let configuration = SmtpServerConfiguration(hostname: "smtp.server",
@@ -41,21 +41,12 @@ let configuration = SmtpServerConfiguration(hostname: "smtp.server",
                                             password: "passw0rd",
                                             secure: .ssl)
 
-services.register(configuration)
-try services.register(SmtpClientProvider())
-```
-
-Using SMTP client.
-
-```swift
-let smtpClientService = try app.make(SmtpClientService.self)
-
 let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
                   to: [EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe")],
                   subject: "The subject (text)",
                   body: "This is email body.")
 
-smtpClientService.send(email, on: request).map { result in
+request.send(email, configuration: configuration).map { result in
     switch result {
     case .success:
         print("Email has been sent")

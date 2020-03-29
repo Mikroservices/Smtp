@@ -1,5 +1,5 @@
 import NIO
-import NIOOpenSSL
+import NIOSSL
 
 internal final class InboundSendEmailHandler: ChannelInboundHandler {
     typealias InboundIn = SmtpResponse
@@ -40,14 +40,14 @@ internal final class InboundSendEmailHandler: ChannelInboundHandler {
     }
 
     func send(ctx: ChannelHandlerContext, command: SmtpRequest) {
-        ctx.writeAndFlush(self.wrapOutboundOut(command)).cascadeFailure(promise: self.allDonePromise)
+        ctx.writeAndFlush(self.wrapOutboundOut(command)).cascadeFailure(to: self.allDonePromise)
     }
 
     func channelRead(ctx: ChannelHandlerContext, data: NIOAny) {
         let result = self.unwrapInboundIn(data)
         switch result {
         case .error(let message):
-            self.allDonePromise.fail(error: SmtpError(message))
+            self.allDonePromise.fail(SmtpError(message))
             return
         case .ok:
             () // cool
@@ -95,7 +95,7 @@ internal final class InboundSendEmailHandler: ChannelInboundHandler {
             self.send(ctx: ctx, command: .quit)
             self.currentlyWaitingFor = .okAfterQuit
         case .okAfterQuit:
-            self.allDonePromise.succeed()
+            self.allDonePromise.succeed(())
             self.currentlyWaitingFor = .nothing
         case .nothing:
             () // ignoring more data whilst quit (it's odd though)

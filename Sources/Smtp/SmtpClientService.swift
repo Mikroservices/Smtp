@@ -1,6 +1,6 @@
 import Foundation
 import NIO
-import NIOOpenSSL
+import NIOSSL
 import Vapor
 
 /// This is simple implementation of SMTP client service.
@@ -8,7 +8,7 @@ import Vapor
 ///
 /// # Usage
 ///
-/// **Register in Vapor**
+/// **Using SMTP client**
 ///
 ///```swift
 /// let configuration = SmtpServerConfiguration(hostname: "smtp.server",
@@ -17,21 +17,12 @@ import Vapor
 ///                                             password: "passw0rd",
 ///                                             secure: .ssl)
 ///
-/// services.register(configuration)
-/// try services.register(SmtpClientProvider())
-///```
-///
-/// **Using SMTP client**
-///
-///```swift
-/// let smtpClientService = try app.make(SmtpClientService.self)
-///
 /// let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
 ///                   to: [EmailAddress("ben.doe@testxx.com")],
 ///                   subject: "The subject (text)",
 ///                   body: "This is email body.")
 ///
-/// smtpClientService.send(email, on: request).map { result in
+/// request.send(email, configuration: configuration).map { result in
 ///     switch result {
 ///     case .success:
 ///         print("Email has been sent")
@@ -92,64 +83,56 @@ import Vapor
 /// `StartTlsHandler` is responsible for establishing SSL encryption after `STARTTLS`
 /// command (this handler adds dynamically `OpenSSLClientHandler` to the pipeline if
 /// server supports that encryption.
-public class SmtpClientService: Service {
-
-    let connectTimeout: TimeAmount = TimeAmount.seconds(10)
-    let configuration: SmtpServerConfiguration
-
-    /// Initialization of client.
-    ///
-    /// - parameters:
-    ///     - configuration: Email SMTP server configuration.
-    public init(configuration: SmtpServerConfiguration) {
-        self.configuration = configuration
-    }
+public extension Request {
 
     /// Sending an email.
     ///
     /// - parameters:
     ///     - email: Email which will be send.
-    ///     - worker: EventLoop which will be used to send email.
+    ///     - configuration: Configuration of SMTP server.
+    ///     - logHandler: Callback which can be used for logging/printing of sending status messages.
     /// - returns: An `Future<Result>` with information about sent email.
-    public func send(_ email: Email, on worker: Worker, logHandler: ((String) -> Void)? = nil) -> Future<Result<Bool, Error>> {
-
-        let emailSentPromise: EventLoopPromise<Void> = worker.eventLoop.newPromise()
+    func send(_ email: Email, configuration: SmtpServerConfiguration, logHandler: ((String) -> Void)? = nil) -> EventLoopFuture<Result<Bool, Error>> {
+        let emailSentPromise: EventLoopPromise<Void> = self.eventLoop.makePromise()
 
         // Client configuration
-        let bootstrap = ClientBootstrap(group: worker.eventLoop)
-            .connectTimeout(self.connectTimeout)
+        let bootstrap = ClientBootstrap(group: self.eventLoop)
+            .connectTimeout(configuration.connectTimeout)
             .channelOption(ChannelOptions.socket(SocketOptionLevel(SOL_SOCKET), SO_REUSEADDR), value: 1)
             .channelInitializer { channel in
 
-                let secureChannelFuture = self.configuration.secure.configureChannel(on: channel, hostname: self.configuration.hostname)
-                return secureChannelFuture.then {
+                let secureChannelFuture = configuration.secure.configureChannel(on: channel, hostname: configuration.hostname)
+                return secureChannelFuture.flatMap {
 
                     let defaultHandlers: [ChannelHandler] = [
                         DuplexMessagesHandler(handler: logHandler),
-                        InboundLineBasedFrameDecoder(),
+                        ByteToMessageHandler(InboundLineBasedFrameDecoder()),
                         InboundSmtpResponseDecoder(),
-                        OutboundSmtpRequestEncoder(),
-                        StartTlsHandler(configuration: self.configuration, allDonePromise: emailSentPromise),
-                        InboundSendEmailHandler(configuration: self.configuration,
+                        MessageToByteHandler(OutboundSmtpRequestEncoder()),
+                        StartTlsHandler(configuration: configuration, allDonePromise: emailSentPromise),
+                        InboundSendEmailHandler(configuration: configuration,
                                                 email: email,
                                                 allDonePromise: emailSentPromise)
                     ]
 
-                    return channel.pipeline.addHandlers(defaultHandlers, first: false)
+                    return channel.pipeline.addHandlers(defaultHandlers, position: .first)
                 }
             }
 
         // Connect and send email.
         let connection = bootstrap.connect(host: configuration.hostname, port: configuration.port)
-
-        connection.cascadeFailure(promise: emailSentPromise)
-
-        return emailSentPromise.futureResult.map {
+        
+        return emailSentPromise.futureResult.map { () -> Result<Bool, Error> in
             connection.whenSuccess { $0.close(promise: nil) }
             return Result.success(true)
-        }.catchMap { error -> Result<Bool, Error> in
-            connection.whenSuccess { $0.close(promise: nil) }
-            return Result.failure(error)
         }
+        
+//        return emailSentPromise.futureResult.map { () -> (Result<Bool, Error>) in
+//            connection.whenSuccess { $0.close(promise: nil) }
+//            return Result.success(true)
+//        } .catchMap { error -> Result<Bool, Error> in
+//            connection.whenSuccess { $0.close(promise: nil) }
+//            return Result.failure(error)
+//        }
     }
 }

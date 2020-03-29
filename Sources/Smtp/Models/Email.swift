@@ -45,62 +45,62 @@ extension Email {
         dateFormatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss Z"
         let dateFormatted = dateFormatter.string(from: date)
 
-        out.write(string: "From: \(self.formatMIME(emailAddress: self.from))\r\n")
+        out.writeString("From: \(self.formatMIME(emailAddress: self.from))\r\n")
 
         let toAddresses = self.to.map { self.formatMIME(emailAddress: $0) }.joined(separator: ", ")
-        out.write(string: "To: \(toAddresses)\r\n")
+        out.writeString("To: \(toAddresses)\r\n")
 
         if let cc = self.cc {
             let ccAddresses = cc.map { self.formatMIME(emailAddress: $0) }.joined(separator: ", ")
-            out.write(string: "Cc: \(ccAddresses)\r\n")
+            out.writeString("Cc: \(ccAddresses)\r\n")
         }
 
         if let replyTo = self.replyTo {
-            out.write(string: "Reply-to: \(self.formatMIME(emailAddress:replyTo))\r\n")
+            out.writeString("Reply-to: \(self.formatMIME(emailAddress:replyTo))\r\n")
         }
 
-        out.write(string: "Subject: \(self.subject)\r\n")
-        out.write(string: "Date: \(dateFormatted)\r\n")
-        out.write(string: "Message-ID: <\(date.timeIntervalSince1970)\(self.from.address.drop { $0 != "@" })>\r\n")
+        out.writeString("Subject: \(self.subject)\r\n")
+        out.writeString("Date: \(dateFormatted)\r\n")
+        out.writeString("Message-ID: <\(date.timeIntervalSince1970)\(self.from.address.drop { $0 != "@" })>\r\n")
 
         let boundary = self.boundary()
         if self.attachments.count > 0 {
-            out.write(string: "Content-type: multipart/mixed; boundary=\"\(boundary)\"\r\n")
-            out.write(string: "Mime-Version: 1.0\r\n\r\n")
+            out.writeString("Content-type: multipart/mixed; boundary=\"\(boundary)\"\r\n")
+            out.writeString("Mime-Version: 1.0\r\n\r\n")
         } else if self.isBodyHtml {
-            out.write(string: "Content-Type: text/html; charset=\"UTF-8\"\r\n")
-            out.write(string: "Mime-Version: 1.0\r\n\r\n")
+            out.writeString("Content-Type: text/html; charset=\"UTF-8\"\r\n")
+            out.writeString("Mime-Version: 1.0\r\n\r\n")
         } else {
-            out.write(string: "Content-Type: text/plain; charset=\"UTF-8\"\r\n")
-            out.write(string: "Mime-Version: 1.0\r\n\r\n")
+            out.writeString("Content-Type: text/plain; charset=\"UTF-8\"\r\n")
+            out.writeString("Mime-Version: 1.0\r\n\r\n")
         }
 
         if self.attachments.count > 0 {
 
             if self.isBodyHtml {
-                out.write(string: "--\(boundary)\r\n")
-                out.write(string: "Content-Type: text/html; charset=\"UTF-8\"\r\n\r\n")
-                out.write(string: "\(self.body)\r\n")
-                out.write(string: "--\(boundary)\r\n")
+                out.writeString("--\(boundary)\r\n")
+                out.writeString("Content-Type: text/html; charset=\"UTF-8\"\r\n\r\n")
+                out.writeString("\(self.body)\r\n")
+                out.writeString("--\(boundary)\r\n")
             } else {
-                out.write(string: "--\(boundary)\r\n\r\n")
-                out.write(string: "\(self.body)\r\n")
-                out.write(string: "--\(boundary)\r\n")
+                out.writeString("--\(boundary)\r\n\r\n")
+                out.writeString("\(self.body)\r\n")
+                out.writeString("--\(boundary)\r\n")
             }
 
             for attachment in self.attachments {
-                out.write(string: "Content-type: \(attachment.contentType)\r\n")
-                out.write(string: "Content-Transfer-Encoding: base64\r\n")
-                out.write(string: "Content-Disposition: attachment; filename=\"\(attachment.name)\"\r\n\r\n")
-                out.write(string: "\(attachment.data.base64EncodedString())\r\n")
-                out.write(string: "--\(boundary)\r\n")
+                out.writeString("Content-type: \(attachment.contentType)\r\n")
+                out.writeString("Content-Transfer-Encoding: base64\r\n")
+                out.writeString("Content-Disposition: attachment; filename=\"\(attachment.name)\"\r\n\r\n")
+                out.writeString("\(attachment.data.base64EncodedString())\r\n")
+                out.writeString("--\(boundary)\r\n")
             }
 
         } else {
-            out.write(string: self.body)
+            out.writeString(self.body)
         }
 
-        out.write(string: "\r\n.")
+        out.writeString("\r\n.")
     }
 
     private func boundary() -> String {

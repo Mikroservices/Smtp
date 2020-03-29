@@ -27,9 +27,9 @@ internal class InboundLineBasedFrameDecoder: ByteToMessageDecoder {
 
     public init() { }
 
-    public func decode(ctx: ChannelHandlerContext, buffer: inout ByteBuffer) throws -> DecodingState {
+    public func decode(context: ChannelHandlerContext, buffer: inout ByteBuffer) throws -> DecodingState {
         if let frame = try self.findNextFrame(buffer: &buffer) {
-            ctx.fireChannelRead(wrapInboundOut(frame))
+            context.fireChannelRead(wrapInboundOut(frame))
             return .continue
         } else {
             return .needMoreData
