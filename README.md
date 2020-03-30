@@ -75,7 +75,7 @@ request.send(email).map { result in
 You can use `logHandler` to handle and print all messages send/retrieved from email server.
 
 ```swift
-smtpClientService.send(email, on: request) { message in
+request.send(email) { message in
     print(message)
 }.map { result in
     ...
