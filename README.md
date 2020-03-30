@@ -32,21 +32,35 @@ Add the dependency to `Package.swift`:
 .package(url: "https://github.com/Mikroservices/Smtp.git", from: "2.0.0")
 ```
 
+Set the SMTP server configuration (main.swift).s
+
+```swift
+import Smtp
+
+var env = try Environment.detect()
+try LoggingSystem.bootstrap(from: &env)
+
+let app = Application(env)
+defer { app.shutdown() }
+
+app.smtp.configuration.host = "smtp.server"
+app.smtp.configuration.username = "johndoe"
+app.smtp.configuration.password = "passw0rd"
+app.smtp.configuration.secure = .ssl
+
+try configure(app)
+try app.run()
+```
+
 Using SMTP client.
 
 ```swift
-let configuration = SmtpServerConfiguration(hostname: "smtp.server",
-                                            port: 465,
-                                            username: "johndoe",
-                                            password: "passw0rd",
-                                            secure: .ssl)
-
 let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
                   to: [EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe")],
                   subject: "The subject (text)",
                   body: "This is email body.")
 
-request.send(email, configuration: configuration).map { result in
+request.send(email).map { result in
     switch result {
     case .success:
         print("Email has been sent")
