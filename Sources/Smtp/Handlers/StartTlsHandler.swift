@@ -1,7 +1,7 @@
 import NIO
 import NIOSSL
 
-internal final class StartTlsHandler: ChannelDuplexHandler {
+internal final class StartTlsHandler: ChannelDuplexHandler, RemovableChannelHandler {
     typealias InboundIn = SmtpResponse
     typealias InboundOut = SmtpResponse
     typealias OutboundIn = SmtpRequest
@@ -70,10 +70,10 @@ internal final class StartTlsHandler: ChannelDuplexHandler {
         do {
             let sslContext = try NIOSSLContext(configuration: .forClient())
             let sslHandler = try NIOSSLClientHandler(context: sslContext, serverHostname: self.serverConfiguration.hostname)
-            _ = context.channel.pipeline.addHandler(sslHandler, name: "SSLHandler", position: .first)
+            _ = context.channel.pipeline.addHandler(sslHandler, name: "NIOSSLClientHandler", position: .first)
 
             context.fireChannelRead(data)
-            _ = context.channel.pipeline.removeHandler(name: "SSLHandler")
+            _ = context.channel.pipeline.removeHandler(self)
         } catch let error {
             self.allDonePromise.fail(error)
         }
