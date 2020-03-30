@@ -9,10 +9,10 @@ public struct SmtpServerConfiguration {
     var secure: SmtpSecureChannel
     var connectTimeout:TimeAmount
 
-    public init(hostname: String,
-                port: Int,
-                username: String,
-                password: String,
+    public init(hostname: String = "",
+                port: Int = 465,
+                username: String = "",
+                password: String = "",
                 secure: SmtpSecureChannel = .none,
                 connectTimeout: TimeAmount = TimeAmount.seconds(10)
     ) {
