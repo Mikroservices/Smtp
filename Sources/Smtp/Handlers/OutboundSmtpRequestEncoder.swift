@@ -5,32 +5,32 @@ import Foundation
 internal final class OutboundSmtpRequestEncoder: MessageToByteEncoder {
     typealias OutboundIn = SmtpRequest
 
-    func encode(ctx: ChannelHandlerContext, data: SmtpRequest, out: inout ByteBuffer) throws {
+    func encode(data: SmtpRequest, out: inout ByteBuffer) {
         switch data {
         case .sayHello(serverName: let server):
-            out.write(string: "HELO \(server)")
+            out.writeString("HELO \(server)")
         case .startTls:
-            out.write(string: "STARTTLS")
+            out.writeString("STARTTLS")
         case .mailFrom(let from):
-            out.write(string: "MAIL FROM:<\(from)>")
+            out.writeString("MAIL FROM:<\(from)>")
         case .recipient(let rcpt):
-            out.write(string: "RCPT TO:<\(rcpt)>")
+            out.writeString("RCPT TO:<\(rcpt)>")
         case .data:
-            out.write(string: "DATA")
+            out.writeString("DATA")
         case .transferData(let email):
             email.write(to: &out)
         case .quit:
-            out.write(string: "QUIT")
+            out.writeString("QUIT")
         case .beginAuthentication:
-            out.write(string: "AUTH LOGIN")
+            out.writeString("AUTH LOGIN")
         case .authUser(let user):
             let userData = Data(user.utf8)
-            out.write(bytes: userData.base64EncodedData())
+            out.writeBytes(userData.base64EncodedData())
         case .authPassword(let password):
             let passwordData = Data(password.utf8)
-            out.write(bytes: passwordData.base64EncodedData())
+            out.writeBytes(passwordData.base64EncodedData())
         }
 
-        out.write(string: "\r\n")
+        out.writeString("\r\n")
     }
 }

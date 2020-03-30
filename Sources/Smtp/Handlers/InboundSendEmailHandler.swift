@@ -1,5 +1,5 @@
 import NIO
-import NIOOpenSSL
+import NIOSSL
 
 internal final class InboundSendEmailHandler: ChannelInboundHandler {
     typealias InboundIn = SmtpResponse
@@ -39,15 +39,15 @@ internal final class InboundSendEmailHandler: ChannelInboundHandler {
         }
     }
 
-    func send(ctx: ChannelHandlerContext, command: SmtpRequest) {
-        ctx.writeAndFlush(self.wrapOutboundOut(command)).cascadeFailure(promise: self.allDonePromise)
+    func send(context: ChannelHandlerContext, command: SmtpRequest) {
+        context.writeAndFlush(self.wrapOutboundOut(command)).cascadeFailure(to: self.allDonePromise)
     }
 
-    func channelRead(ctx: ChannelHandlerContext, data: NIOAny) {
+    func channelRead(context: ChannelHandlerContext, data: NIOAny) {
         let result = self.unwrapInboundIn(data)
         switch result {
         case .error(let message):
-            self.allDonePromise.fail(error: SmtpError(message))
+            self.allDonePromise.fail(SmtpError(message))
             return
         case .ok:
             () // cool
@@ -55,52 +55,52 @@ internal final class InboundSendEmailHandler: ChannelInboundHandler {
 
         switch self.currentlyWaitingFor {
         case .initialMessageFromServer:
-            self.send(ctx: ctx, command: .sayHello(serverName: self.serverConfiguration.hostname))
+            self.send(context: context, command: .sayHello(serverName: self.serverConfiguration.hostname))
             self.currentlyWaitingFor = .okAfterHello
         case .okAfterHello:
 
             if self.shouldInitializeTls() {
-                self.send(ctx: ctx, command: .startTls)
+                self.send(context: context, command: .startTls)
                 self.currentlyWaitingFor = .okAfterStartTls
             } else {
-                self.send(ctx: ctx, command: .beginAuthentication)
+                self.send(context: context, command: .beginAuthentication)
                 self.currentlyWaitingFor = .okAfterAuthBegin
             }
 
         case .okAfterStartTls:
-            self.send(ctx: ctx, command: .beginAuthentication)
+            self.send(context: context, command: .beginAuthentication)
             self.currentlyWaitingFor = .okAfterAuthBegin
         case .okAfterAuthBegin:
-            self.send(ctx: ctx, command: .authUser(self.serverConfiguration.username))
+            self.send(context: context, command: .authUser(self.serverConfiguration.username))
             self.currentlyWaitingFor = .okAfterUsername
         case .okAfterUsername:
-            self.send(ctx: ctx, command: .authPassword(self.serverConfiguration.password))
+            self.send(context: context, command: .authPassword(self.serverConfiguration.password))
             self.currentlyWaitingFor = .okAfterPassword
         case .okAfterPassword:
-            self.send(ctx: ctx, command: .mailFrom(self.email.from.address))
+            self.send(context: context, command: .mailFrom(self.email.from.address))
             self.currentlyWaitingFor = .okAfterMailFrom
         case .okAfterMailFrom:
             if let recipient = self.recipients.popLast() {
-                self.send(ctx: ctx, command: .recipient(recipient.address))
+                self.send(context: context, command: .recipient(recipient.address))
             } else {
                 fallthrough
             }
         case .okAfterRecipient:
-            self.send(ctx: ctx, command: .data)
+            self.send(context: context, command: .data)
             self.currentlyWaitingFor = .okAfterDataCommand
         case .okAfterDataCommand:
-            self.send(ctx: ctx, command: .transferData(email))
+            self.send(context: context, command: .transferData(email))
             self.currentlyWaitingFor = .okAfterMailData
         case .okAfterMailData:
-            self.send(ctx: ctx, command: .quit)
+            self.send(context: context, command: .quit)
             self.currentlyWaitingFor = .okAfterQuit
         case .okAfterQuit:
-            self.allDonePromise.succeed()
+            self.allDonePromise.succeed(())
             self.currentlyWaitingFor = .nothing
         case .nothing:
             () // ignoring more data whilst quit (it's odd though)
         case .error:
-            fatalError("error state")
+            self.allDonePromise.fail(SmtpError("Communication error state"))
         }
     }
 

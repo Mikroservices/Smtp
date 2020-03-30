@@ -1,7 +1,7 @@
 import NIO
-import NIOOpenSSL
+import NIOSSL
 
-internal final class StartTlsHandler: ChannelDuplexHandler {
+internal final class StartTlsHandler: ChannelDuplexHandler, RemovableChannelHandler {
     typealias InboundIn = SmtpResponse
     typealias InboundOut = SmtpResponse
     typealias OutboundIn = SmtpRequest
@@ -16,10 +16,10 @@ internal final class StartTlsHandler: ChannelDuplexHandler {
         self.allDonePromise = allDonePromise
     }
 
-    func channelRead(ctx: ChannelHandlerContext, data: NIOAny) {
+    func channelRead(context: ChannelHandlerContext, data: NIOAny) {
 
         if self.startTlsDisabled() {
-            ctx.fireChannelRead(data)
+            context.fireChannelRead(data)
             return
         }
 
@@ -31,26 +31,26 @@ internal final class StartTlsHandler: ChannelDuplexHandler {
             case .error(let message):
                 if self.serverConfiguration.secure == .startTls {
                     // Fail only if tls is required.
-                    self.allDonePromise.fail(error: SmtpError(message))
+                    self.allDonePromise.fail(SmtpError(message))
                     return
                 }
 
                 // Tls is not required, we can continue without encryption.
                 let startTlsResult = self.wrapInboundOut(.ok(200, "STARTTLS is not supported"))
-                ctx.fireChannelRead(startTlsResult)
+                context.fireChannelRead(startTlsResult)
                 return
             case .ok:
-                self.initializeTlsHandler(ctx: ctx, data: data)
+                self.initializeTlsHandler(context: context, data: data)
             }
         } else {
-            ctx.fireChannelRead(data)
+            context.fireChannelRead(data)
         }
     }
 
-    func write(ctx: ChannelHandlerContext, data: NIOAny, promise: EventLoopPromise<Void>?) {
+    func write(context: ChannelHandlerContext, data: NIOAny, promise: EventLoopPromise<Void>?) {
 
         if self.startTlsDisabled() {
-            ctx.write(data, promise: promise)
+            context.write(data, promise: promise)
             return
         }
 
@@ -63,19 +63,19 @@ internal final class StartTlsHandler: ChannelDuplexHandler {
         }
 
 
-        ctx.write(data, promise: promise)
+        context.write(data, promise: promise)
     }
 
-    private func initializeTlsHandler(ctx: ChannelHandlerContext, data: NIOAny) {
+    private func initializeTlsHandler(context: ChannelHandlerContext, data: NIOAny) {
         do {
-            let sslContext = try SSLContext(configuration: .forClient())
-            let sslHandler = try OpenSSLClientHandler(context: sslContext, serverHostname: self.serverConfiguration.hostname)
-            _ = ctx.channel.pipeline.addHandlers(sslHandler, first: true)
+            let sslContext = try NIOSSLContext(configuration: .forClient())
+            let sslHandler = try NIOSSLClientHandler(context: sslContext, serverHostname: self.serverConfiguration.hostname)
+            _ = context.channel.pipeline.addHandler(sslHandler, name: "NIOSSLClientHandler", position: .first)
 
-            ctx.fireChannelRead(data)
-            _ = ctx.channel.pipeline.remove(handler: self)
+            context.fireChannelRead(data)
+            _ = context.channel.pipeline.removeHandler(self)
         } catch let error {
-            self.allDonePromise.fail(error: error)
+            self.allDonePromise.fail(error)
         }
     }
 

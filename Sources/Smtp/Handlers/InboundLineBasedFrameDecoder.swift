@@ -27,16 +27,16 @@ internal class InboundLineBasedFrameDecoder: ByteToMessageDecoder {
 
     public init() { }
 
-    public func decode(ctx: ChannelHandlerContext, buffer: inout ByteBuffer) throws -> DecodingState {
-        if let frame = try self.findNextFrame(buffer: &buffer) {
-            ctx.fireChannelRead(wrapInboundOut(frame))
+    public func decode(context: ChannelHandlerContext, buffer: inout ByteBuffer) -> DecodingState {
+        if let frame = self.findNextFrame(buffer: &buffer) {
+            context.fireChannelRead(wrapInboundOut(frame))
             return .continue
         } else {
             return .needMoreData
         }
     }
 
-    private func findNextFrame(buffer: inout ByteBuffer) throws -> ByteBuffer? {
+    private func findNextFrame(buffer: inout ByteBuffer) -> ByteBuffer? {
         let view = buffer.readableBytesView.dropFirst(self.lastScanOffset)
         // look for the delimiter
         if let delimiterIndex = view.firstIndex(of: 0x0A) { // '\n'
@@ -54,18 +54,18 @@ internal class InboundLineBasedFrameDecoder: ByteToMessageDecoder {
         return nil
     }
 
-    public func handlerRemoved(ctx: ChannelHandlerContext) {
-        self.handleLeftOverBytes(ctx: ctx)
+    public func handlerRemoved(context: ChannelHandlerContext) {
+        self.handleLeftOverBytes(context: context)
     }
 
-    public func channelInactive(ctx: ChannelHandlerContext) {
-        self.handleLeftOverBytes(ctx: ctx)
+    public func channelInactive(context: ChannelHandlerContext) {
+        self.handleLeftOverBytes(context: context)
     }
 
-    private func handleLeftOverBytes(ctx: ChannelHandlerContext) {
+    private func handleLeftOverBytes(context: ChannelHandlerContext) {
         if let buffer = self.cumulationBuffer, buffer.readableBytes > 0 && !self.handledLeftovers {
             self.handledLeftovers = true
-            ctx.fireErrorCaught(NIOExtrasErrors.LeftOverBytesError(leftOverBytes: buffer))
+            context.fireErrorCaught(NIOExtrasErrors.LeftOverBytesError(leftOverBytes: buffer))
         }
     }
 }

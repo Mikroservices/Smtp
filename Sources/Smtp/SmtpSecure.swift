@@ -1,6 +1,6 @@
 import Vapor
 import NIO
-import NIOOpenSSL
+import NIOSSL
 
 public enum SmtpSecureChannel {
 
@@ -21,18 +21,18 @@ public enum SmtpSecureChannel {
     /// the server supports the STARTTLS extension.
     case startTlsWhenAvailable
 
-    internal func configureChannel(on channel: Channel, hostname: String) -> Future<Void> {
+    internal func configureChannel(on channel: Channel, hostname: String) -> EventLoopFuture<Void> {
         switch self {
         case .ssl:
             do {
-                let sslContext = try SSLContext(configuration: .forClient())
-                let sslHandler = try OpenSSLClientHandler(context: sslContext, serverHostname: hostname)
-                return channel.pipeline.add(handler: sslHandler)
+                let sslContext = try NIOSSLContext(configuration: .forClient())
+                let sslHandler = try NIOSSLClientHandler(context: sslContext, serverHostname: hostname)
+                return channel.pipeline.addHandler(sslHandler)
             } catch {
-                return Future.done(on: channel.eventLoop)
+                return channel.eventLoop.makeSucceededFuture(())
             }
         default:
-            return Future.done(on: channel.eventLoop)
+            return channel.eventLoop.makeSucceededFuture(())
         }
     }
 }
