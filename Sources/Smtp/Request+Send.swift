@@ -115,24 +115,18 @@ public extension Request {
                                                 allDonePromise: emailSentPromise)
                     ]
 
-                    return channel.pipeline.addHandlers(defaultHandlers, position: .first)
+                    return channel.pipeline.addHandlers(defaultHandlers, position: .last)
                 }
             }
 
         // Connect and send email.
         let connection = bootstrap.connect(host: configuration.hostname, port: configuration.port)
         
+        connection.cascadeFailure(to: emailSentPromise)
+        
         return emailSentPromise.futureResult.map { () -> Result<Bool, Error> in
             connection.whenSuccess { $0.close(promise: nil) }
             return Result.success(true)
         }
-        
-//        return emailSentPromise.futureResult.map { () -> (Result<Bool, Error>) in
-//            connection.whenSuccess { $0.close(promise: nil) }
-//            return Result.success(true)
-//        } .catchMap { error -> Result<Bool, Error> in
-//            connection.whenSuccess { $0.close(promise: nil) }
-//            return Result.failure(error)
-//        }
     }
 }

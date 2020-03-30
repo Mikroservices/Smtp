@@ -54,18 +54,18 @@ internal class InboundLineBasedFrameDecoder: ByteToMessageDecoder {
         return nil
     }
 
-    public func handlerRemoved(ctx: ChannelHandlerContext) {
-        self.handleLeftOverBytes(ctx: ctx)
+    public func handlerRemoved(context: ChannelHandlerContext) {
+        self.handleLeftOverBytes(context: context)
     }
 
-    public func channelInactive(ctx: ChannelHandlerContext) {
-        self.handleLeftOverBytes(ctx: ctx)
+    public func channelInactive(context: ChannelHandlerContext) {
+        self.handleLeftOverBytes(context: context)
     }
 
-    private func handleLeftOverBytes(ctx: ChannelHandlerContext) {
+    private func handleLeftOverBytes(context: ChannelHandlerContext) {
         if let buffer = self.cumulationBuffer, buffer.readableBytes > 0 && !self.handledLeftovers {
             self.handledLeftovers = true
-            ctx.fireErrorCaught(NIOExtrasErrors.LeftOverBytesError(leftOverBytes: buffer))
+            context.fireErrorCaught(NIOExtrasErrors.LeftOverBytesError(leftOverBytes: buffer))
         }
     }
 }

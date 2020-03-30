@@ -16,10 +16,10 @@ internal final class StartTlsHandler: ChannelDuplexHandler {
         self.allDonePromise = allDonePromise
     }
 
-    func channelRead(ctx: ChannelHandlerContext, data: NIOAny) {
+    func channelRead(context: ChannelHandlerContext, data: NIOAny) {
 
         if self.startTlsDisabled() {
-            ctx.fireChannelRead(data)
+            context.fireChannelRead(data)
             return
         }
 
@@ -37,20 +37,20 @@ internal final class StartTlsHandler: ChannelDuplexHandler {
 
                 // Tls is not required, we can continue without encryption.
                 let startTlsResult = self.wrapInboundOut(.ok(200, "STARTTLS is not supported"))
-                ctx.fireChannelRead(startTlsResult)
+                context.fireChannelRead(startTlsResult)
                 return
             case .ok:
-                self.initializeTlsHandler(ctx: ctx, data: data)
+                self.initializeTlsHandler(context: context, data: data)
             }
         } else {
-            ctx.fireChannelRead(data)
+            context.fireChannelRead(data)
         }
     }
 
-    func write(ctx: ChannelHandlerContext, data: NIOAny, promise: EventLoopPromise<Void>?) {
+    func write(context: ChannelHandlerContext, data: NIOAny, promise: EventLoopPromise<Void>?) {
 
         if self.startTlsDisabled() {
-            ctx.write(data, promise: promise)
+            context.write(data, promise: promise)
             return
         }
 
@@ -63,17 +63,17 @@ internal final class StartTlsHandler: ChannelDuplexHandler {
         }
 
 
-        ctx.write(data, promise: promise)
+        context.write(data, promise: promise)
     }
 
-    private func initializeTlsHandler(ctx: ChannelHandlerContext, data: NIOAny) {
+    private func initializeTlsHandler(context: ChannelHandlerContext, data: NIOAny) {
         do {
             let sslContext = try NIOSSLContext(configuration: .forClient())
             let sslHandler = try NIOSSLClientHandler(context: sslContext, serverHostname: self.serverConfiguration.hostname)
-            _ = ctx.channel.pipeline.addHandler(sslHandler, name: "SSLHandler", position: .first)
+            _ = context.channel.pipeline.addHandler(sslHandler, name: "SSLHandler", position: .first)
 
-            ctx.fireChannelRead(data)
-            _ = ctx.channel.pipeline.removeHandler(name: "SSLHandler")
+            context.fireChannelRead(data)
+            _ = context.channel.pipeline.removeHandler(name: "SSLHandler")
         } catch let error {
             self.allDonePromise.fail(error)
         }

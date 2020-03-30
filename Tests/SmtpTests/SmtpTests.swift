@@ -23,17 +23,18 @@ final class SmtpTests: XCTestCase {
                                                        secure: .startTls)
 
     func testSendTextMessage() throws {
-        let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+        let application = Application()
         defer {
-            XCTAssertNoThrow(try eventLoopGroup.syncShutdownGracefully())
+            application.shutdown()
         }
 
         let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
                           to: [EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe")],
                           subject: "The subject (text)",
                           body: "This is email body.")
-
-        let request = Request(application: Application(), on: eventLoopGroup.next())
+        
+        // application.
+        let request = Request(application: application, on: application.eventLoopGroup.next())
         try request.send(email, configuration: smtpConfiguration) { message in
             print(message)
         }.flatMapThrowing { result in
@@ -42,9 +43,9 @@ final class SmtpTests: XCTestCase {
     }
 
     func testSendTextMessageWithoutNames() throws {
-        let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+        let application = Application()
         defer {
-            XCTAssertNoThrow(try eventLoopGroup.syncShutdownGracefully())
+            application.shutdown()
         }
 
         let email = Email(from: EmailAddress(address: "john.doe@testxx.com"),
@@ -52,7 +53,7 @@ final class SmtpTests: XCTestCase {
                           subject: "The subject (without names)",
                           body: "This is email body.")
 
-        let request = Request(application: Application(), on: eventLoopGroup.next())
+        let request = Request(application: application, on: application.eventLoopGroup.next())
         try request.send(email, configuration: smtpConfiguration) { message in
             print(message)
         }.flatMapThrowing { result in
@@ -61,9 +62,9 @@ final class SmtpTests: XCTestCase {
     }
 
     func testSendHtmlMessage() throws {
-        let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+        let application = Application()
         defer {
-            XCTAssertNoThrow(try eventLoopGroup.syncShutdownGracefully())
+            application.shutdown()
         }
 
         let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
@@ -72,7 +73,7 @@ final class SmtpTests: XCTestCase {
                           body: "<html><body><h1>This is email content!</h1></body></html>",
                           isBodyHtml: true)
 
-        let request = Request(application: Application(), on: eventLoopGroup.next())
+        let request = Request(application: application, on: application.eventLoopGroup.next())
         try request.send(email, configuration: smtpConfiguration) { message in
             print(message)
         }.flatMapThrowing { result in
@@ -81,9 +82,9 @@ final class SmtpTests: XCTestCase {
     }
 
     func testSendTextMessageWithAttachments() throws {
-        let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+        let application = Application()
         defer {
-            XCTAssertNoThrow(try eventLoopGroup.syncShutdownGracefully())
+            application.shutdown()
         }
 
         var email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
@@ -94,7 +95,7 @@ final class SmtpTests: XCTestCase {
         email.addAttachment(Attachment(name: "plik1.txt", contentType: "text/plain", data: Attachments.text()))
         email.addAttachment(Attachment(name: "image.png", contentType: "image/png", data: Attachments.image()))
 
-        let request = Request(application: Application(), on: eventLoopGroup.next())
+        let request = Request(application: application, on: application.eventLoopGroup.next())
         try request.send(email, configuration: smtpConfiguration) { message in
             print(message)
         }.flatMapThrowing { result in
@@ -103,9 +104,9 @@ final class SmtpTests: XCTestCase {
     }
 
     func testSendHtmlMessageWithAttachments() throws {
-        let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+        let application = Application()
         defer {
-            XCTAssertNoThrow(try eventLoopGroup.syncShutdownGracefully())
+            application.shutdown()
         }
 
         var email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
@@ -117,7 +118,7 @@ final class SmtpTests: XCTestCase {
         email.addAttachment(Attachment(name: "plik1.txt", contentType: "text/plain", data: Attachments.text()))
         email.addAttachment(Attachment(name: "image.png", contentType: "image/png", data: Attachments.image()))
 
-        let request = Request(application: Application(), on: eventLoopGroup.next())
+        let request = Request(application: application, on: application.eventLoopGroup.next())
         try request.send(email, configuration: smtpConfiguration) { message in
             print(message)
         }.flatMapThrowing { result in
@@ -126,9 +127,9 @@ final class SmtpTests: XCTestCase {
     }
 
     func testSendTextMessageOverSSL() throws {
-        let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+        let application = Application()
         defer {
-            XCTAssertNoThrow(try eventLoopGroup.syncShutdownGracefully())
+            application.shutdown()
         }
 
         var email = Email(from: EmailAddress(address: "marcincz@gmail.com", name: "John Doe"),
@@ -139,7 +140,7 @@ final class SmtpTests: XCTestCase {
         email.addAttachment(Attachment(name: "plik1.txt", contentType: "text/plain", data: Attachments.text()))
         email.addAttachment(Attachment(name: "image.png", contentType: "image/png", data: Attachments.image()))
 
-        let request = Request(application: Application(), on: eventLoopGroup.next())
+        let request = Request(application: application, on: application.eventLoopGroup.next())
         try request.send(email, configuration: sslSmtpConfiguration) { message in
             print(message)
         }.flatMapThrowing { result in
@@ -148,9 +149,9 @@ final class SmtpTests: XCTestCase {
     }
 
     func testSendTextMessageOverTSL() throws {
-        let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+        let application = Application()
         defer {
-            XCTAssertNoThrow(try eventLoopGroup.syncShutdownGracefully())
+            application.shutdown()
         }
 
         var email = Email(from: EmailAddress(address: "marcincz@gmail.com", name: "John Doe"),
@@ -161,7 +162,7 @@ final class SmtpTests: XCTestCase {
         email.addAttachment(Attachment(name: "plik1.txt", contentType: "text/plain", data: Attachments.text()))
         email.addAttachment(Attachment(name: "image.png", contentType: "image/png", data: Attachments.image()))
 
-        let request = Request(application: Application(), on: eventLoopGroup.next())
+        let request = Request(application: application, on: application.eventLoopGroup.next())
         try request.send(email, configuration: tslSmtpConfiguration) { message in
             print(message)
         }.flatMapThrowing { result in
@@ -170,9 +171,9 @@ final class SmtpTests: XCTestCase {
     }
 
     func testSendTextMessageToMultipleRecipients() throws {
-        let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+        let application = Application()
         defer {
-            XCTAssertNoThrow(try eventLoopGroup.syncShutdownGracefully())
+            application.shutdown()
         }
 
         let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
@@ -183,7 +184,7 @@ final class SmtpTests: XCTestCase {
                           subject: "The subject (multiple to)",
                           body: "This is email body.")
 
-        let request = Request(application: Application(), on: eventLoopGroup.next())
+        let request = Request(application: application, on: application.eventLoopGroup.next())
         try request.send(email, configuration: smtpConfiguration) { message in
             print(message)
         }.flatMapThrowing { result in
@@ -192,9 +193,9 @@ final class SmtpTests: XCTestCase {
     }
 
     func testSendTextMessageWithCC() throws {
-        let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+        let application = Application()
         defer {
-            XCTAssertNoThrow(try eventLoopGroup.syncShutdownGracefully())
+            application.shutdown()
         }
 
         let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
@@ -209,7 +210,7 @@ final class SmtpTests: XCTestCase {
                           subject: "The subject (multiple cc)",
                           body: "This is email body.")
 
-        let request = Request(application: Application(), on: eventLoopGroup.next())
+        let request = Request(application: application, on: application.eventLoopGroup.next())
         try request.send(email, configuration: smtpConfiguration) { message in
             print(message)
         }.flatMapThrowing { result in
@@ -218,9 +219,9 @@ final class SmtpTests: XCTestCase {
     }
 
     func testSendTextMessageWithReplyTo() throws {
-        let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+        let application = Application()
         defer {
-            XCTAssertNoThrow(try eventLoopGroup.syncShutdownGracefully())
+            application.shutdown()
         }
 
         let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
@@ -229,7 +230,7 @@ final class SmtpTests: XCTestCase {
                           body: "This is email body.",
                           replyTo: EmailAddress(address: "noreply@testxx.com"))
 
-        let request = Request(application: Application(), on: eventLoopGroup.next())
+        let request = Request(application: application, on: application.eventLoopGroup.next())
         try request.send(email, configuration: smtpConfiguration) { message in
             print(message)
         }.flatMapThrowing { result in
