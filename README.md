@@ -1,8 +1,8 @@
 # Smtp
 
-[![Build Status](https://travis-ci.org/Mikroservices/Smtp.svg?branch=master)](https://travis-ci.org/Mikroservices/Smtp)
-[![Swift 5.0](https://img.shields.io/badge/Swift-5.0-orange.svg?style=flat)](ttps://developer.apple.com/swift/)
-[![Vapor 3](https://img.shields.io/badge/vapor-3.0-blue.svg?style=flat)](https://vapor.codes)
+![Build Status](https://github.com/Mikroservices/Smtp/workflows/Build/badge.svg)
+[![Swift 5.2](https://img.shields.io/badge/Swift-5.2-orange.svg?style=flat)](ttps://developer.apple.com/swift/)
+[![Vapor 4](https://img.shields.io/badge/vapor-4.0-blue.svg?style=flat)](https://vapor.codes)
 [![Swift Package Manager](https://img.shields.io/badge/SPM-compatible-4BC51D.svg?style=flat)](https://swift.org/package-manager/)
 [![Platforms OS X | Linux](https://img.shields.io/badge/Platforms-OS%20X%20%7C%20Linux%20-lightgray.svg?style=flat)](https://developer.apple.com/swift/)
 
