@@ -1,8 +1,0 @@
-language: swift
-os: osx
-osx_image: xcode11.4
-before_script:
-- brew install libressl
-script: 
-- swift package generate-xcodeproj
-- swift build

@@ -8,8 +8,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-        - uses: actions/checkout@master
-        - uses: YOCKOW/Action-setup-swift@master
-          with:
-            swift-version: '5.2' # This value is passed to swiftenv without modification. 
-        - run: swift build
+    - uses: actions/checkout@master
+    - uses: YOCKOW/Action-setup-swift@master
+      with:
+        swift-version: '5.2'
+    - name: Build
+      run: swift build
