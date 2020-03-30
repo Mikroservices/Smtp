@@ -8,21 +8,35 @@ import Vapor
 ///
 /// # Usage
 ///
+/// **Set the SMTP server configuration (main.swift).**
+///
+///```swift
+/// import Smtp
+///
+/// var env = try Environment.detect()
+/// try LoggingSystem.bootstrap(from: &env)
+///
+/// let app = Application(env)
+/// defer { app.shutdown() }
+///
+/// app.smtp.configuration.host = "smtp.server"
+/// app.smtp.configuration.username = "johndoe"
+/// app.smtp.configuration.password = "passw0rd"
+/// app.smtp.configuration.secure = .ssl
+///
+/// try configure(app)
+/// try app.run()
+///```
+///
 /// **Using SMTP client**
 ///
 ///```swift
-/// let configuration = SmtpServerConfiguration(hostname: "smtp.server",
-///                                             port: 465,
-///                                             username: "johndoe",
-///                                             password: "passw0rd",
-///                                             secure: .ssl)
-///
 /// let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
 ///                   to: [EmailAddress("ben.doe@testxx.com")],
 ///                   subject: "The subject (text)",
 ///                   body: "This is email body.")
 ///
-/// request.send(email, configuration: configuration).map { result in
+/// request.send(email).map { result in
 ///     switch result {
 ///     case .success:
 ///         print("Email has been sent")
@@ -89,12 +103,12 @@ public extension Request {
     ///
     /// - parameters:
     ///     - email: Email which will be send.
-    ///     - configuration: Configuration of SMTP server.
     ///     - logHandler: Callback which can be used for logging/printing of sending status messages.
     /// - returns: An `Future<Result>` with information about sent email.
-    func send(_ email: Email, configuration: SmtpServerConfiguration, logHandler: ((String) -> Void)? = nil) -> EventLoopFuture<Result<Bool, Error>> {
+    func send(_ email: Email, logHandler: ((String) -> Void)? = nil) -> EventLoopFuture<Result<Bool, Error>> {
         let emailSentPromise: EventLoopPromise<Void> = self.eventLoop.makePromise()
-
+        let configuration = self.application.smtp.configuration
+        
         // Client configuration
         let bootstrap = ClientBootstrap(group: self.eventLoop)
             .connectTimeout(configuration.connectTimeout)

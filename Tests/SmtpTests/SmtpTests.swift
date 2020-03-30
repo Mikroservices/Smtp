@@ -28,14 +28,14 @@ final class SmtpTests: XCTestCase {
             application.shutdown()
         }
 
+        application.smtp.configuration = smtpConfiguration
         let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
                           to: [EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe")],
                           subject: "The subject (text)",
                           body: "This is email body.")
         
-        // application.
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.send(email, configuration: smtpConfiguration) { message in
+        try request.send(email) { message in
             print(message)
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())
@@ -48,13 +48,14 @@ final class SmtpTests: XCTestCase {
             application.shutdown()
         }
 
+        application.smtp.configuration = smtpConfiguration
         let email = Email(from: EmailAddress(address: "john.doe@testxx.com"),
                           to: [EmailAddress(address: "ben.doe@testxx.com")],
                           subject: "The subject (without names)",
                           body: "This is email body.")
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.send(email, configuration: smtpConfiguration) { message in
+        try request.send(email) { message in
             print(message)
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())
@@ -67,6 +68,7 @@ final class SmtpTests: XCTestCase {
             application.shutdown()
         }
 
+        application.smtp.configuration = smtpConfiguration
         let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
                           to: [EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe")],
                           subject: "The subject (html)",
@@ -74,7 +76,7 @@ final class SmtpTests: XCTestCase {
                           isBodyHtml: true)
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.send(email, configuration: smtpConfiguration) { message in
+        try request.send(email) { message in
             print(message)
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())
@@ -87,6 +89,7 @@ final class SmtpTests: XCTestCase {
             application.shutdown()
         }
 
+        application.smtp.configuration = smtpConfiguration
         var email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
                           to: [EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe")],
                           subject: "The subject (text)",
@@ -96,7 +99,7 @@ final class SmtpTests: XCTestCase {
         email.addAttachment(Attachment(name: "image.png", contentType: "image/png", data: Attachments.image()))
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.send(email, configuration: smtpConfiguration) { message in
+        try request.send(email) { message in
             print(message)
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())
@@ -109,6 +112,7 @@ final class SmtpTests: XCTestCase {
             application.shutdown()
         }
 
+        application.smtp.configuration = smtpConfiguration
         var email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
                           to: [EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe")],
                           subject: "The subject (html)",
@@ -119,7 +123,7 @@ final class SmtpTests: XCTestCase {
         email.addAttachment(Attachment(name: "image.png", contentType: "image/png", data: Attachments.image()))
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.send(email, configuration: smtpConfiguration) { message in
+        try request.send(email) { message in
             print(message)
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())
@@ -131,7 +135,8 @@ final class SmtpTests: XCTestCase {
         defer {
             application.shutdown()
         }
-
+        
+        application.smtp.configuration = sslSmtpConfiguration
         var email = Email(from: EmailAddress(address: "marcincz@gmail.com", name: "John Doe"),
                           to: [EmailAddress(address: "mczachurski@icloud.com", name: "Ben Doe")],
                           subject: "The subject (text)",
@@ -141,7 +146,7 @@ final class SmtpTests: XCTestCase {
         email.addAttachment(Attachment(name: "image.png", contentType: "image/png", data: Attachments.image()))
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.send(email, configuration: sslSmtpConfiguration) { message in
+        try request.send(email) { message in
             print(message)
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())
@@ -154,6 +159,7 @@ final class SmtpTests: XCTestCase {
             application.shutdown()
         }
 
+        application.smtp.configuration = tslSmtpConfiguration
         var email = Email(from: EmailAddress(address: "marcincz@gmail.com", name: "John Doe"),
                           to: [EmailAddress(address: "mczachurski@icloud.com", name: "Ben Doe")],
                           subject: "The subject (text)",
@@ -163,7 +169,7 @@ final class SmtpTests: XCTestCase {
         email.addAttachment(Attachment(name: "image.png", contentType: "image/png", data: Attachments.image()))
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.send(email, configuration: tslSmtpConfiguration) { message in
+        try request.send(email) { message in
             print(message)
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())
@@ -176,6 +182,7 @@ final class SmtpTests: XCTestCase {
             application.shutdown()
         }
 
+        application.smtp.configuration = smtpConfiguration
         let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
                           to: [
                             EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe"),
@@ -185,7 +192,7 @@ final class SmtpTests: XCTestCase {
                           body: "This is email body.")
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.send(email, configuration: smtpConfiguration) { message in
+        try request.send(email) { message in
             print(message)
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())
@@ -198,6 +205,7 @@ final class SmtpTests: XCTestCase {
             application.shutdown()
         }
 
+        application.smtp.configuration = smtpConfiguration
         let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
                           to: [
                             EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe"),
@@ -211,7 +219,7 @@ final class SmtpTests: XCTestCase {
                           body: "This is email body.")
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.send(email, configuration: smtpConfiguration) { message in
+        try request.send(email) { message in
             print(message)
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())
@@ -224,6 +232,7 @@ final class SmtpTests: XCTestCase {
             application.shutdown()
         }
 
+        application.smtp.configuration = smtpConfiguration
         let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
                           to: [EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe")],
                           subject: "The subject (reply-to)",
@@ -231,7 +240,7 @@ final class SmtpTests: XCTestCase {
                           replyTo: EmailAddress(address: "noreply@testxx.com"))
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.send(email, configuration: smtpConfiguration) { message in
+        try request.send(email) { message in
             print(message)
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())

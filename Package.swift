@@ -11,10 +11,11 @@ let package = Package(
     products: [
         // Products define the executables and libraries produced by a package, and make them visible to other packages.
         .library(name: "Smtp", targets: ["Smtp"]),
+        .library(name: "SmtpTests", targets: ["SmtpTests"])
     ],
     dependencies: [
         // 💧 A server-side Swift web framework. 
-        .package(url: "https://github.com/vapor/vapor.git", .upToNextMajor(from: "4.0.0-rc.3.11")),
+        .package(url: "https://github.com/vapor/vapor.git", .upToNextMajor(from: "4.0.0-rc.3.12")),
 
         // Event-driven network application framework for high performance protocol servers & clients, non-blocking.
         .package(url: "https://github.com/apple/swift-nio.git", .upToNextMajor(from: "2.15.0")),
@@ -31,7 +32,8 @@ let package = Package(
         .testTarget(name: "SmtpTests", dependencies: [
             .product(name: "NIO", package: "swift-nio"),
             .product(name: "NIOSSL", package: "swift-nio-ssl"),
-            .product(name: "Vapor", package: "vapor")
+            .product(name: "Vapor", package: "vapor"),
+            .target(name: "Smtp")
         ])
     ]
 )
