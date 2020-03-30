@@ -127,6 +127,8 @@ public extension Request {
         return emailSentPromise.futureResult.map { () -> Result<Bool, Error> in
             connection.whenSuccess { $0.close(promise: nil) }
             return Result.success(true)
+        }.flatMapError { error -> EventLoopFuture<Result<Bool, Error>> in
+            return self.eventLoop.makeSucceededFuture(Result.failure(error))
         }
     }
 }

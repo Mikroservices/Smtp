@@ -5,7 +5,7 @@ import Foundation
 internal final class OutboundSmtpRequestEncoder: MessageToByteEncoder {
     typealias OutboundIn = SmtpRequest
 
-    func encode(data: SmtpRequest, out: inout ByteBuffer) throws {
+    func encode(data: SmtpRequest, out: inout ByteBuffer) {
         switch data {
         case .sayHello(serverName: let server):
             out.writeString("HELO \(server)")

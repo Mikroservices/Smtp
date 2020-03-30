@@ -27,8 +27,8 @@ internal class InboundLineBasedFrameDecoder: ByteToMessageDecoder {
 
     public init() { }
 
-    public func decode(context: ChannelHandlerContext, buffer: inout ByteBuffer) throws -> DecodingState {
-        if let frame = try self.findNextFrame(buffer: &buffer) {
+    public func decode(context: ChannelHandlerContext, buffer: inout ByteBuffer) -> DecodingState {
+        if let frame = self.findNextFrame(buffer: &buffer) {
             context.fireChannelRead(wrapInboundOut(frame))
             return .continue
         } else {
@@ -36,7 +36,7 @@ internal class InboundLineBasedFrameDecoder: ByteToMessageDecoder {
         }
     }
 
-    private func findNextFrame(buffer: inout ByteBuffer) throws -> ByteBuffer? {
+    private func findNextFrame(buffer: inout ByteBuffer) -> ByteBuffer? {
         let view = buffer.readableBytesView.dropFirst(self.lastScanOffset)
         // look for the delimiter
         if let delimiterIndex = view.firstIndex(of: 0x0A) { // '\n'

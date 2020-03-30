@@ -100,7 +100,7 @@ internal final class InboundSendEmailHandler: ChannelInboundHandler {
         case .nothing:
             () // ignoring more data whilst quit (it's odd though)
         case .error:
-            fatalError("error state")
+            self.allDonePromise.fail(SmtpError("Communication error state"))
         }
     }
 
