@@ -101,3 +101,10 @@ $ cd Smtp
 $ open Packages.swift
 ```
 You can build and run tests directly in Xcode.
+
+## Testing
+
+Unit (integration) tests requires correct email credentials. Credentials are not check-in to the repository.
+If you want to run unit tests you have to use your [mailtrap](https://mailtrap.io) account and/or other email provider credentials.
+
+All you need to do is replacing the configuration section in `Tests/SmtpTests/SmtpTests.swift` file.

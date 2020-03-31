@@ -43,6 +43,8 @@ final class SmtpTests: XCTestCase {
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())
         }.wait()
+        
+        sleep(3)
     }
 
     func testSendTextMessageWithoutNames() throws {
@@ -63,6 +65,8 @@ final class SmtpTests: XCTestCase {
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())
         }.wait()
+        
+        sleep(3)
     }
 
     func testSendHtmlMessage() throws {
@@ -84,6 +88,8 @@ final class SmtpTests: XCTestCase {
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())
         }.wait()
+        
+        sleep(3)
     }
 
     func testSendTextMessageWithAttachments() throws {
@@ -107,6 +113,8 @@ final class SmtpTests: XCTestCase {
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())
         }.wait()
+        
+        sleep(3)
     }
 
     func testSendHtmlMessageWithAttachments() throws {
@@ -131,6 +139,8 @@ final class SmtpTests: XCTestCase {
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())
         }.wait()
+        
+        sleep(3)
     }
 
     func testSendTextMessageToMultipleRecipients() throws {
@@ -154,6 +164,8 @@ final class SmtpTests: XCTestCase {
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())
         }.wait()
+        
+        sleep(3)
     }
 
     func testSendTextMessageWithCC() throws {
@@ -181,6 +193,8 @@ final class SmtpTests: XCTestCase {
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())
         }.wait()
+        
+        sleep(3)
     }
 
     func testSendTextMessageWithReplyTo() throws {
@@ -202,6 +216,8 @@ final class SmtpTests: XCTestCase {
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())
         }.wait()
+        
+        sleep(3)
     }
 
     func testSendTextMessageOverSSL() throws {
