@@ -26,13 +26,22 @@ Features:
 
 ## Getting started
 
-Add the dependency to `Package.swift`:
+You need to add library to `Package.swift` file:
 
+ - add package to dependencies:
 ```swift
 .package(url: "https://github.com/Mikroservices/Smtp.git", from: "2.0.0")
 ```
 
-Set the SMTP server configuration (main.swift).s
+- and add product to your target:
+```swift
+.target(name: "App", dependencies: [
+    .product(name: "Vapor", package: "vapor"),
+    .product(name: "Smtp", package: "Smtp")
+])
+```
+
+Set the SMTP server configuration (e.g. in `main.swift` file).
 
 ```swift
 import Smtp
@@ -81,3 +90,14 @@ request.send(email) { message in
     ...
 }
 ```
+
+## Developing
+
+After cloning the repository you can open it in Xcode.
+
+```bash
+$ git clone https://github.com/Mikroservices/Smtp.git
+$ cd Smtp
+$ open Packages.swift
+```
+You can build and run tests directly in Xcode.
