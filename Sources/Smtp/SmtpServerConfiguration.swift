@@ -2,12 +2,12 @@ import NIO
 import Vapor
 
 public struct SmtpServerConfiguration {
-    var hostname: String
-    var port: Int
-    var username: String
-    var password: String
-    var secure: SmtpSecureChannel
-    var connectTimeout:TimeAmount
+    public var hostname: String
+    public var port: Int
+    public var username: String
+    public var password: String
+    public var secure: SmtpSecureChannel
+    public var connectTimeout:TimeAmount
 
     public init(hostname: String = "",
                 port: Int = 465,

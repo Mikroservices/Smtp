@@ -1,6 +1,6 @@
 public struct EmailAddress {
-    let address: String
-    let name: String?
+    public let address: String
+    public let name: String?
 
     public init(address: String, name: String? = nil) {
         self.address = address

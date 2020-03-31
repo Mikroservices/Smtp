@@ -1,9 +1,9 @@
 import Foundation
 
 public struct Attachment {
-    let name: String
-    let contentType: String
-    let data: Data
+    public let name: String
+    public let contentType: String
+    public let data: Data
 
     init(name: String, contentType: String, data: Data) {
         self.name = name
