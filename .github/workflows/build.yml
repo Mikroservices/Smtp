@@ -12,5 +12,15 @@ jobs:
     - uses: YOCKOW/Action-setup-swift@master
       with:
         swift-version: '5.2'
+    - shell: bash
+      env:
+        MAILTRAPPASS: ${{ secrets.MAILTRAPPASS }}
+      run: sed -i -e 's/#MAILTRAPPASS#/$MAILTRAPPASS/g' Tests/SmtpTests/SmtpTests.swift
+      - shell: bash
+      env:
+        GMAILPASS: ${{ secrets.GMAILPASS }}
+      run: sed -i -e 's/#MAILTRAPPASS#/$GMAILPASS/g' Tests/SmtpTests/SmtpTests.swift
     - name: Build
       run: swift build
+    - name: Tests
+      run: swift test
