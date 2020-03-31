@@ -16,12 +16,12 @@ jobs:
       env:
         MAILTRAPPASS: ${{ secrets.MAILTRAPPASS }}
       run: |
-        sed -i -e 's/#MAILTRAPPASS#/$MAILTRAPPASS/g' Tests/SmtpTests/SmtpTests.swift
+        sed -i -e 's/#MAILTRAPPASS#/'"$MAILTRAPPASS"'/g' Tests/SmtpTests/SmtpTests.swift
     - shell: bash
       env:
         GMAILPASS: ${{ secrets.GMAILPASS }}
       run: |
-        sed -i -e 's/#MAILTRAPPASS#/$GMAILPASS/g' Tests/SmtpTests/SmtpTests.swift
+        sed -i -e 's/#MAILTRAPPASS#/'"$GMAILPASS"'/g' Tests/SmtpTests/SmtpTests.swift
     - name: Build
       run: swift build
     - name: Tests
