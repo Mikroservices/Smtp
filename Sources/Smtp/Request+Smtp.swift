@@ -104,7 +104,7 @@ public extension Request {
     /// - parameters:
     ///     - email: Email which will be send.
     ///     - logHandler: Callback which can be used for logging/printing of sending status messages.
-    /// - returns: An `Future<Result>` with information about sent email.
+    /// - returns: An `EventLoopFuture<Result<Bool, Error>>` with information about sent email.
     func send(_ email: Email, logHandler: ((String) -> Void)? = nil) -> EventLoopFuture<Result<Bool, Error>> {
         let emailSentPromise: EventLoopPromise<Void> = self.eventLoop.makePromise()
         let configuration = self.application.smtp.configuration
