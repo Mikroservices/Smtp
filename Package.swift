@@ -14,10 +14,10 @@ let package = Package(
     ],
     dependencies: [
         // 💧 A server-side Swift web framework. 
-        .package(url: "https://github.com/vapor/vapor.git", .upToNextMajor(from: "4.0.0-rc.3.12")),
+        .package(url: "https://github.com/vapor/vapor.git", .upToNextMajor(from: "4.0.1")),
 
         // Event-driven network application framework for high performance protocol servers & clients, non-blocking.
-        .package(url: "https://github.com/apple/swift-nio.git", .upToNextMajor(from: "2.15.0")),
+        .package(url: "https://github.com/apple/swift-nio.git", .upToNextMajor(from: "2.16.0")),
 
         // Bindings to OpenSSL-compatible libraries for TLS support in SwiftNIO
         .package(url: "https://github.com/apple/swift-nio-ssl.git", .upToNextMajor(from: "2.7.1"))
