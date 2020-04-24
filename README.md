@@ -98,7 +98,7 @@ After cloning the repository you can open it in Xcode.
 ```bash
 $ git clone https://github.com/Mikroservices/Smtp.git
 $ cd Smtp
-$ open Packages.swift
+$ open Package.swift
 ```
 You can build and run tests directly in Xcode.
 
