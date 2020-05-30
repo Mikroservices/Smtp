@@ -38,15 +38,36 @@ final class SmtpTests: XCTestCase {
                           body: "This is email body.")
         
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.send(email) { message in
+        try request.smtp.send(email) { message in
             print(message)
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())
         }.wait()
-        
+
         sleep(3)
     }
 
+    func testSendTextMessageViaApplication() throws {
+        let application = Application()
+        defer {
+            application.shutdown()
+        }
+
+        application.smtp.configuration = smtpConfiguration
+        let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
+                          to: [EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe")],
+                          subject: "The subject (text) - \(timestamp)",
+                          body: "This is email body.")
+        
+        try application.smtp.send(email) { message in
+            print(message)
+        }.flatMapThrowing { result in
+            XCTAssertTrue(try result.get())
+        }.wait()
+
+        sleep(3)
+    }
+    
     func testSendTextMessageWithoutNames() throws {
         let application = Application()
         defer {
@@ -60,7 +81,7 @@ final class SmtpTests: XCTestCase {
                           body: "This is email body.")
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.send(email) { message in
+        try request.smtp.send(email) { message in
             print(message)
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())
@@ -83,7 +104,7 @@ final class SmtpTests: XCTestCase {
                           isBodyHtml: true)
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.send(email) { message in
+        try request.smtp.send(email) { message in
             print(message)
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())
@@ -108,7 +129,7 @@ final class SmtpTests: XCTestCase {
         email.addAttachment(Attachment(name: "image.png", contentType: "image/png", data: Attachments.image()))
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.send(email) { message in
+        try request.smtp.send(email) { message in
             print(message)
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())
@@ -134,7 +155,7 @@ final class SmtpTests: XCTestCase {
         email.addAttachment(Attachment(name: "image.png", contentType: "image/png", data: Attachments.image()))
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.send(email) { message in
+        try request.smtp.send(email) { message in
             print(message)
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())
@@ -159,7 +180,7 @@ final class SmtpTests: XCTestCase {
                           body: "This is email body.")
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.send(email) { message in
+        try request.smtp.send(email) { message in
             print(message)
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())
@@ -188,7 +209,7 @@ final class SmtpTests: XCTestCase {
                           body: "This is email body.")
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.send(email) { message in
+        try request.smtp.send(email) { message in
             print(message)
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())
@@ -211,7 +232,7 @@ final class SmtpTests: XCTestCase {
                           replyTo: EmailAddress(address: "noreply@testxx.com"))
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.send(email) { message in
+        try request.smtp.send(email) { message in
             print(message)
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())
@@ -236,7 +257,7 @@ final class SmtpTests: XCTestCase {
         email.addAttachment(Attachment(name: "image.png", contentType: "image/png", data: Attachments.image()))
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.send(email) { message in
+        try request.smtp.send(email) { message in
             print(message)
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())
@@ -259,7 +280,7 @@ final class SmtpTests: XCTestCase {
         email.addAttachment(Attachment(name: "image.png", contentType: "image/png", data: Attachments.image()))
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.send(email) { message in
+        try request.smtp.send(email) { message in
             print(message)
         }.flatMapThrowing { result in
             XCTAssertTrue(try result.get())

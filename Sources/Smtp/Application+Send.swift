@@ -97,8 +97,7 @@ import Vapor
 /// `StartTlsHandler` is responsible for establishing SSL encryption after `STARTTLS`
 /// command (this handler adds dynamically `OpenSSLClientHandler` to the pipeline if
 /// server supports that encryption.
-public extension Request {
-
+public extension Application.Smtp {
     /// Sending an email.
     ///
     /// - parameters:
@@ -106,11 +105,11 @@ public extension Request {
     ///     - logHandler: Callback which can be used for logging/printing of sending status messages.
     /// - returns: An `EventLoopFuture<Result<Bool, Error>>` with information about sent email.
     func send(_ email: Email, logHandler: ((String) -> Void)? = nil) -> EventLoopFuture<Result<Bool, Error>> {
-        let emailSentPromise: EventLoopPromise<Void> = self.eventLoop.makePromise()
+        let emailSentPromise: EventLoopPromise<Void> = self.application.eventLoopGroup.next().makePromise()
         let configuration = self.application.smtp.configuration
         
         // Client configuration
-        let bootstrap = ClientBootstrap(group: self.eventLoop)
+        let bootstrap = ClientBootstrap(group: self.application.eventLoopGroup.next())
             .connectTimeout(configuration.connectTimeout)
             .channelOption(ChannelOptions.socket(SocketOptionLevel(SOL_SOCKET), SO_REUSEADDR), value: 1)
             .channelInitializer { channel in
@@ -142,7 +141,7 @@ public extension Request {
             connection.whenSuccess { $0.close(promise: nil) }
             return Result.success(true)
         }.flatMapError { error -> EventLoopFuture<Result<Bool, Error>> in
-            return self.eventLoop.makeSucceededFuture(Result.failure(error))
+            return self.application.eventLoopGroup.future(Result.failure(error))
         }
     }
 }

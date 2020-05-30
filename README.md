@@ -69,7 +69,7 @@ let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John
                   subject: "The subject (text)",
                   body: "This is email body.")
 
-request.send(email).map { result in
+request.smtp.send(email).map { result in
     switch result {
     case .success:
         print("Email has been sent")
@@ -79,12 +79,20 @@ request.send(email).map { result in
 }
 ```
 
+Also you can send emails directly via `application` class.
+
+```swift
+app.smtp.send(email).map { result in
+    ...
+}
+```
+
 ## Troubleshoots
 
 You can use `logHandler` to handle and print all messages send/retrieved from email server.
 
 ```swift
-request.send(email) { message in
+request.smtp.send(email) { message in
     print(message)
 }.map { result in
     ...
