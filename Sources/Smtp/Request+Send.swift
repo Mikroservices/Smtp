@@ -11,7 +11,7 @@ public extension Request {
     struct Smtp {
         let request: Request
 
-        func send(_ email: Email, logHandler: ((String) -> Void)? = nil) -> EventLoopFuture<Result<Bool, Error>> {
+        public func send(_ email: Email, logHandler: ((String) -> Void)? = nil) -> EventLoopFuture<Result<Bool, Error>> {
             return self.request.application.smtp.send(email, logHandler: logHandler)
         }
     }
