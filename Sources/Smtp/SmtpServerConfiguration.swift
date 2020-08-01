@@ -8,13 +8,15 @@ public struct SmtpServerConfiguration {
     public var password: String
     public var secure: SmtpSecureChannel
     public var connectTimeout:TimeAmount
+    public var helloMethod: HelloMethod
 
     public init(hostname: String = "",
                 port: Int = 465,
                 username: String = "",
                 password: String = "",
                 secure: SmtpSecureChannel = .none,
-                connectTimeout: TimeAmount = TimeAmount.seconds(10)
+                connectTimeout: TimeAmount = TimeAmount.seconds(10),
+                helloMethod: HelloMethod = .helo
     ) {
         self.hostname = hostname
         self.port = port
@@ -22,5 +24,6 @@ public struct SmtpServerConfiguration {
         self.password = password
         self.secure = secure
         self.connectTimeout = connectTimeout
+        self.helloMethod = helloMethod
     }
 }

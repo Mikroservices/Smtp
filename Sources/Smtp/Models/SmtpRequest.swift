@@ -1,5 +1,5 @@
 internal enum SmtpRequest {
-    case sayHello(serverName: String)
+    case sayHello(serverName: String, helloMethod: HelloMethod)
     case startTls
     case beginAuthentication
     case authUser(String)
@@ -9,4 +9,9 @@ internal enum SmtpRequest {
     case data
     case transferData(Email)
     case quit
+}
+
+internal enum HelloMethod {
+    case helo
+    case ehlo
 }
