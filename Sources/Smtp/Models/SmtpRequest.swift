@@ -11,7 +11,7 @@ internal enum SmtpRequest {
     case quit
 }
 
-internal enum HelloMethod {
-    case helo
-    case ehlo
+public enum HelloMethod: String {
+    case helo = "HELO"
+    case ehlo = "EHLO"
 }
