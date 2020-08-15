@@ -10,8 +10,3 @@ internal enum SmtpRequest {
     case transferData(Email)
     case quit
 }
-
-public enum HelloMethod: String {
-    case helo = "HELO"
-    case ehlo = "EHLO"
-}

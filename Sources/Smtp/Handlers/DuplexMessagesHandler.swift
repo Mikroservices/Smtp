@@ -16,7 +16,7 @@ internal final class DuplexMessagesHandler: ChannelDuplexHandler {
 
         if let handler = self.handler {
             let buffer = self.unwrapInboundIn(data)
-            handler("☁️ \(String(decoding: buffer.readableBytesView, as: UTF8.self))")
+            handler("==> \(String(decoding: buffer.readableBytesView, as: UTF8.self))")
         }
 
         context.fireChannelRead(data)
@@ -26,7 +26,7 @@ internal final class DuplexMessagesHandler: ChannelDuplexHandler {
 
         if let handler = self.handler {
             let buffer = self.unwrapOutboundIn(data)
-            handler("🖥 \(String(decoding: buffer.readableBytesView, as: UTF8.self))")
+            handler("<== \(String(decoding: buffer.readableBytesView, as: UTF8.self))")
         }
 
         context.write(data, promise: promise)
