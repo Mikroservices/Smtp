@@ -7,19 +7,19 @@ final class SmtpTests: XCTestCase {
 
     let smtpConfiguration = SmtpServerConfiguration(hostname: "smtp.mailtrap.io",
                                                     port: 465,
-                                                    username: "8396cb1ecc7959",
+                                                    username: "#MAILTRAPUSER#",
                                                     password: "#MAILTRAPPASS#",
                                                     secure: .none)
 
     let sslSmtpConfiguration = SmtpServerConfiguration(hostname: "smtp.gmail.com",
                                                        port: 465,
-                                                       username: "smtp.mikroservice@gmail.com",
+                                                       username: "#GMAILUSER#",
                                                        password: "#GMAILPASS#",
                                                        secure: .ssl)
 
     let tslSmtpConfiguration = SmtpServerConfiguration(hostname: "smtp.gmail.com",
                                                        port: 587,
-                                                       username: "smtp.mikroservice@gmail.com",
+                                                       username: "#GMAILUSER#",
                                                        password: "#GMAILPASS#",
                                                        secure: .startTls)
 

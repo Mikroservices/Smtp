@@ -14,9 +14,19 @@ jobs:
         swift-version: '5.2'
     - shell: bash
       env:
+        MAILTRAPPASS: ${{ secrets.MAILTRAPUSER }}
+      run: |
+        sed -i -e 's/#MAILTRAPUSER#/'"$MAILTRAPUSER"'/g' Tests/SmtpTests/SmtpTests.swift
+    - shell: bash
+      env:
         MAILTRAPPASS: ${{ secrets.MAILTRAPPASS }}
       run: |
         sed -i -e 's/#MAILTRAPPASS#/'"$MAILTRAPPASS"'/g' Tests/SmtpTests/SmtpTests.swift
+    - shell: bash
+      env:
+        GMAILPASS: ${{ secrets.GMAILUSER }}
+      run: |
+        sed -i -e 's/#GMAILUSER#/'"$GMAILUSER"'/g' Tests/SmtpTests/SmtpTests.swift
     - shell: bash
       env:
         GMAILPASS: ${{ secrets.GMAILPASS }}
