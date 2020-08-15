@@ -7,8 +7,8 @@ internal final class OutboundSmtpRequestEncoder: MessageToByteEncoder {
 
     func encode(data: SmtpRequest, out: inout ByteBuffer) {
         switch data {
-        case .sayHello(serverName: let server):
-            out.writeString("HELO \(server)")
+        case .sayHello(serverName: let server, helloMethod: let helloMethod):
+            out.writeString("\(helloMethod.rawValue) \(server)")
         case .startTls:
             out.writeString("STARTTLS")
         case .mailFrom(let from):

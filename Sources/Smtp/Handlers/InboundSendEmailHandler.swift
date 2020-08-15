@@ -55,7 +55,11 @@ internal final class InboundSendEmailHandler: ChannelInboundHandler {
 
         switch self.currentlyWaitingFor {
         case .initialMessageFromServer:
-            self.send(context: context, command: .sayHello(serverName: self.serverConfiguration.hostname))
+            self.send(context: context,
+                      command: .sayHello(serverName: self.serverConfiguration.hostname,
+                                         helloMethod: self.serverConfiguration.helloMethod
+                )
+            )
             self.currentlyWaitingFor = .okAfterHello
         case .okAfterHello:
 
