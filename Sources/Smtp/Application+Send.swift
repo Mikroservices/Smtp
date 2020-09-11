@@ -102,10 +102,14 @@ public extension Application.Smtp {
     ///
     /// - parameters:
     ///     - email: Email which will be send.
+    ///     - eventLoop: Event lopp which will be used to send email (if nil then event loop from application will be created).
     ///     - logHandler: Callback which can be used for logging/printing of sending status messages.
     /// - returns: An `EventLoopFuture<Result<Bool, Error>>` with information about sent email.
-    func send(_ email: Email, logHandler: ((String) -> Void)? = nil) -> EventLoopFuture<Result<Bool, Error>> {
-        let emailSentPromise: EventLoopPromise<Void> = self.application.eventLoopGroup.next().makePromise()
+    func send(_ email: Email, eventLoop: EventLoop? = nil, logHandler: ((String) -> Void)? = nil) -> EventLoopFuture<Result<Bool, Error>> {
+        
+        let smtpEventLoop = eventLoop ?? self.application.eventLoopGroup
+        let emailSentPromise: EventLoopPromise<Void> = smtpEventLoop.next().makePromise()
+        
         let configuration = self.application.smtp.configuration
         
         // Client configuration
@@ -141,7 +145,7 @@ public extension Application.Smtp {
             connection.whenSuccess { $0.close(promise: nil) }
             return Result.success(true)
         }.flatMapError { error -> EventLoopFuture<Result<Bool, Error>> in
-            return self.application.eventLoopGroup.future(Result.failure(error))
+            return smtpEventLoop.future(Result.failure(error))
         }
     }
 }

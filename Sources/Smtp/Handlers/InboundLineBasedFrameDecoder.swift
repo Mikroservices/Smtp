@@ -38,17 +38,22 @@ internal class InboundLineBasedFrameDecoder: ByteToMessageDecoder {
 
     private func findNextFrame(buffer: inout ByteBuffer) -> ByteBuffer? {
         let view = buffer.readableBytesView.dropFirst(self.lastScanOffset)
+        
         // look for the delimiter
         if let delimiterIndex = view.firstIndex(of: 0x0A) { // '\n'
             let length = delimiterIndex - buffer.readerIndex
             let dropCarriageReturn = delimiterIndex > view.startIndex && view[delimiterIndex - 1] == 0x0D // '\r'
             let buff = buffer.readSlice(length: dropCarriageReturn ? length - 1 : length)
+            
             // drop the delimiter (and trailing carriage return if appicable)
             buffer.moveReaderIndex(forwardBy: dropCarriageReturn ? 2 : 1)
+
             // reset the last scan start index since we found a line
             self.lastScanOffset = 0
+
             return buff
         }
+        
         // next scan we start where we stopped
         self.lastScanOffset = buffer.readableBytes
         return nil
