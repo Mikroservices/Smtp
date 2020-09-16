@@ -11,6 +11,8 @@ internal final class OutboundSmtpRequestEncoder: MessageToByteEncoder {
             out.writeString("\(helloMethod.rawValue) \(server)")
         case .startTls:
             out.writeString("STARTTLS")
+        case .sayHelloAfterTls(serverName: let server, helloMethod: let helloMethod):
+            out.writeString("\(helloMethod.rawValue) \(server)")
         case .mailFrom(let from):
             out.writeString("MAIL FROM:<\(from)>")
         case .recipient(let rcpt):

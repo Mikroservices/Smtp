@@ -9,6 +9,7 @@ internal final class InboundSendEmailHandler: ChannelInboundHandler {
         case initialMessageFromServer
         case okAfterHello
         case okAfterStartTls
+        case okAfterStartTlsHello
         case okAfterAuthBegin
         case okAfterUsername
         case okAfterPassword
@@ -72,6 +73,9 @@ internal final class InboundSendEmailHandler: ChannelInboundHandler {
             }
 
         case .okAfterStartTls:
+            self.send(context: context, command: .sayHelloAfterTls(serverName: self.serverConfiguration.hostname, helloMethod:  self.serverConfiguration.helloMethod))
+            self.currentlyWaitingFor = .okAfterStartTlsHello
+        case .okAfterStartTlsHello:
             self.send(context: context, command: .beginAuthentication)
             self.currentlyWaitingFor = .okAfterAuthBegin
         case .okAfterAuthBegin:
