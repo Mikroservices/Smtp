@@ -2,14 +2,14 @@ import NIO
 import NIOSSL
 
 internal final class InboundSendEmailHandler: ChannelInboundHandler {
-    typealias InboundIn = SmtpResponse
-    typealias OutboundOut = SmtpRequest
+    typealias InboundIn = SMTPResponse
+    typealias OutboundOut = SMTPRequest
 
     enum Expect {
         case initialMessageFromServer
         case okAfterHello
-        case okAfterStartTls
-        case okAfterStartTlsHello
+        case okAfterStartTLS
+        case okAfterStartTLSHello
         case okAfterAuthBegin
         case okAfterUsername
         case okAfterPassword
@@ -25,11 +25,11 @@ internal final class InboundSendEmailHandler: ChannelInboundHandler {
 
     private var currentlyWaitingFor = Expect.initialMessageFromServer
     private let email: Email
-    private let serverConfiguration: SmtpServerConfiguration
+    private let serverConfiguration: SMTPServerConfiguration
     private let allDonePromise: EventLoopPromise<Void>
     private var recipients: [EmailAddress]
 
-    init(configuration: SmtpServerConfiguration, email: Email, allDonePromise: EventLoopPromise<Void>) {
+    init(configuration: SMTPServerConfiguration, email: Email, allDonePromise: EventLoopPromise<Void>) {
         self.email = email
         self.allDonePromise = allDonePromise
         self.serverConfiguration = configuration
@@ -40,7 +40,7 @@ internal final class InboundSendEmailHandler: ChannelInboundHandler {
         }
     }
 
-    func send(context: ChannelHandlerContext, command: SmtpRequest) {
+    func send(context: ChannelHandlerContext, command: SMTPRequest) {
         context.writeAndFlush(self.wrapOutboundOut(command)).cascadeFailure(to: self.allDonePromise)
     }
 
@@ -48,7 +48,7 @@ internal final class InboundSendEmailHandler: ChannelInboundHandler {
         let result = self.unwrapInboundIn(data)
         switch result {
         case .error(let message):
-            self.allDonePromise.fail(SmtpError(message))
+            self.allDonePromise.fail(SMTPError(message))
             return
         case .ok:
             () // cool
@@ -64,18 +64,18 @@ internal final class InboundSendEmailHandler: ChannelInboundHandler {
             self.currentlyWaitingFor = .okAfterHello
         case .okAfterHello:
 
-            if self.shouldInitializeTls() {
-                self.send(context: context, command: .startTls)
-                self.currentlyWaitingFor = .okAfterStartTls
+            if self.shouldInitializeTLS() {
+                self.send(context: context, command: .startTLS)
+                self.currentlyWaitingFor = .okAfterStartTLS
             } else {
                 self.send(context: context, command: .beginAuthentication)
                 self.currentlyWaitingFor = .okAfterAuthBegin
             }
 
-        case .okAfterStartTls:
-            self.send(context: context, command: .sayHelloAfterTls(serverName: self.serverConfiguration.hostname, helloMethod:  self.serverConfiguration.helloMethod))
-            self.currentlyWaitingFor = .okAfterStartTlsHello
-        case .okAfterStartTlsHello:
+        case .okAfterStartTLS:
+            self.send(context: context, command: .sayHelloAfterTLS(serverName: self.serverConfiguration.hostname, helloMethod:  self.serverConfiguration.helloMethod))
+            self.currentlyWaitingFor = .okAfterStartTLSHello
+        case .okAfterStartTLSHello:
             self.send(context: context, command: .beginAuthentication)
             self.currentlyWaitingFor = .okAfterAuthBegin
         case .okAfterAuthBegin:
@@ -108,11 +108,11 @@ internal final class InboundSendEmailHandler: ChannelInboundHandler {
         case .nothing:
             () // ignoring more data whilst quit (it's odd though)
         case .error:
-            self.allDonePromise.fail(SmtpError("Communication error state"))
+            self.allDonePromise.fail(SMTPError("Communication error state"))
         }
     }
 
-    private func shouldInitializeTls() -> Bool {
-        return self.serverConfiguration.secure == .startTls || self.serverConfiguration.secure == .startTlsWhenAvailable
+    private func shouldInitializeTLS() -> Bool {
+        return self.serverConfiguration.secure == .startTLS || self.serverConfiguration.secure == .startTLSWhenAvailable
     }
 }

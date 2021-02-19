@@ -2,7 +2,7 @@ import Vapor
 import NIO
 import NIOSSL
 
-public enum SmtpSecureChannel {
+public enum SMTPSecureChannel {
 
     /// Communication without any encryption (even password is send as a plain text).
     case none
@@ -14,12 +14,12 @@ public enum SmtpSecureChannel {
     /// reading the greeting and capabilities of the server. If the server
     /// does not support the STARTTLS extension, then the connection will
     /// fail and error will be thrown.
-    case startTls
+    case startTLS
 
     /// Elevates the connection to use TLS encryption immediately after
     /// reading the greeting and capabilities of the server, but only if
     /// the server supports the STARTTLS extension.
-    case startTlsWhenAvailable
+    case startTLSWhenAvailable
 
     internal func configureChannel(on channel: Channel, hostname: String) -> EventLoopFuture<Void> {
         switch self {

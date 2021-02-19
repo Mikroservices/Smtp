@@ -1,27 +1,27 @@
 import XCTest
 import NIO
 import Vapor
-@testable import Smtp
+@testable import SMTP
 
-final class SmtpTests: XCTestCase {
+final class SMTPTests: XCTestCase {
 
-    let smtpConfiguration = SmtpServerConfiguration(hostname: "smtp.mailtrap.io",
+    let smtpConfiguration = SMTPServerConfiguration(hostname: "smtp.mailtrap.io",
                                                     port: 465,
                                                     username: "#MAILTRAPUSER#",
                                                     password: "#MAILTRAPPASS#",
                                                     secure: .none)
 
-    let sslSmtpConfiguration = SmtpServerConfiguration(hostname: "smtp.gmail.com",
+    let sslSMTPConfiguration = SMTPServerConfiguration(hostname: "smtp.gmail.com",
                                                        port: 465,
                                                        username: "#GMAILUSER#",
                                                        password: "#GMAILPASS#",
                                                        secure: .ssl)
 
-    let tslSmtpConfiguration = SmtpServerConfiguration(hostname: "smtp.gmail.com",
+    let tslSMTPConfiguration = SMTPServerConfiguration(hostname: "smtp.gmail.com",
                                                        port: 587,
                                                        username: "#GMAILUSER#",
                                                        password: "#GMAILPASS#",
-                                                       secure: .startTls)
+                                                       secure: .startTLS)
 
     let timestamp = DateFormatter.localizedString(from: Date(), dateStyle: .medium, timeStyle: .short)
 
@@ -247,7 +247,7 @@ final class SmtpTests: XCTestCase {
             application.shutdown()
         }
         
-        application.smtp.configuration = sslSmtpConfiguration
+        application.smtp.configuration = sslSMTPConfiguration
         var email = Email(from: EmailAddress(address: "smtp.mikroservice@gmail.com", name: "John Doe"),
                           to: [EmailAddress(address: "smtp.mikroservice@outlook.com", name: "Ben Doe")],
                           subject: "The subject (over SSL) - \(timestamp)",
@@ -270,7 +270,7 @@ final class SmtpTests: XCTestCase {
             application.shutdown()
         }
 
-        application.smtp.configuration = tslSmtpConfiguration
+        application.smtp.configuration = tslSMTPConfiguration
         var email = Email(from: EmailAddress(address: "smtp.mikroservice@gmail.com", name: "John Doe"),
                           to: [EmailAddress(address: "smtp.mikroservice@outlook.com", name: "Ben Doe")],
                           subject: "The subject (over TSL) - \(timestamp)",

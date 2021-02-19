@@ -4,11 +4,11 @@ import NIOSSL
 import Vapor
 
 public extension Request {
-    var smtp: Smtp {
+    var smtp: SMTP {
         .init(request: self)
     }
 
-    struct Smtp {
+    struct SMTP {
         let request: Request
 
         public func send(_ email: Email, logHandler: ((String) -> Void)? = nil) -> EventLoopFuture<Result<Bool, Error>> {
@@ -16,7 +16,7 @@ public extension Request {
         }
     }
     
-    @available(*, deprecated, message: "Function is depraceted and will be deleted in Smtp 3.0. Please use: request.smtp.send() instead.")
+    @available(*, deprecated, message: "Function is depraceted and will be deleted in SMTP 3.0. Please use: request.smtp.send() instead.")
     func send(_ email: Email, logHandler: ((String) -> Void)? = nil) -> EventLoopFuture<Result<Bool, Error>> {
         return self.application.smtp.send(email, eventLoop: self.eventLoop, logHandler: logHandler)
     }

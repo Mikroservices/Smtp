@@ -1,6 +1,6 @@
 //
 //  Attachments.swift
-//  SmtpTests
+//  SMTPTests
 //
 //  Created by Marcin Czachurski on 16/04/2019.
 //

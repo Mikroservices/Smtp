@@ -1,6 +1,6 @@
 import Foundation
 
-struct SmtpError: Error {
+struct SMTPError: Error {
     let message: String
 
     init(_ message: String) {

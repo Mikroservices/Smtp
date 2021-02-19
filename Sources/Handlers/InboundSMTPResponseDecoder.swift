@@ -1,8 +1,8 @@
 import NIO
 
-internal final class InboundSmtpResponseDecoder: ChannelInboundHandler {
+internal final class InboundSMTPResponseDecoder: ChannelInboundHandler {
     typealias InboundIn = ByteBuffer
-    typealias InboundOut = SmtpResponse
+    typealias InboundOut = SMTPResponse
 
     func channelRead(context: ChannelHandlerContext, data: NIOAny) {
         var response = self.unwrapInboundIn(data)
@@ -16,7 +16,7 @@ internal final class InboundSmtpResponseDecoder: ChannelInboundHandler {
             switch (firstCharacter, fourthCharacter) {
             case ("2", " "),
                  ("3", " "):
-                let parsedMessage = SmtpResponse.ok(code, remainder)
+                let parsedMessage = SMTPResponse.ok(code, remainder)
                 context.fireChannelRead(self.wrapInboundOut(parsedMessage))
             case (_, "-"):
                 () // intermediate message, ignore
@@ -24,7 +24,7 @@ internal final class InboundSmtpResponseDecoder: ChannelInboundHandler {
                 context.fireChannelRead(self.wrapInboundOut(.error(firstFourBytes+remainder)))
             }
         } else {
-            context.fireErrorCaught(SmtpResponseDecoderError.malformedMessage)
+            context.fireErrorCaught(SMTPResponseDecoderError.malformedMessage)
         }
     }
 }

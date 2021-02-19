@@ -1,12 +1,12 @@
 import NIO
 import Vapor
 
-public struct SmtpServerConfiguration {
+public struct SMTPServerConfiguration {
     public var hostname: String
     public var port: Int
     public var username: String
     public var password: String
-    public var secure: SmtpSecureChannel
+    public var secure: SMTPSecureChannel
     public var connectTimeout:TimeAmount
     public var helloMethod: HelloMethod
 
@@ -14,7 +14,7 @@ public struct SmtpServerConfiguration {
                 port: Int = 465,
                 username: String = "",
                 password: String = "",
-                secure: SmtpSecureChannel = .none,
+                secure: SMTPSecureChannel = .none,
                 connectTimeout: TimeAmount = TimeAmount.seconds(10),
                 helloMethod: HelloMethod = .helo
     ) {

@@ -1,4 +1,4 @@
-internal enum SmtpResponse {
+internal enum SMTPResponse {
     case ok(Int, String)
     case error(String)
 }

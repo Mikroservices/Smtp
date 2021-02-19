@@ -2,16 +2,16 @@ import NIO
 import NIOFoundationCompat
 import Foundation
 
-internal final class OutboundSmtpRequestEncoder: MessageToByteEncoder {
-    typealias OutboundIn = SmtpRequest
+internal final class OutboundSMTPRequestEncoder: MessageToByteEncoder {
+    typealias OutboundIn = SMTPRequest
 
-    func encode(data: SmtpRequest, out: inout ByteBuffer) {
+    func encode(data: SMTPRequest, out: inout ByteBuffer) {
         switch data {
         case .sayHello(serverName: let server, helloMethod: let helloMethod):
             out.writeString("\(helloMethod.rawValue) \(server)")
-        case .startTls:
+        case .startTLS:
             out.writeString("STARTTLS")
-        case .sayHelloAfterTls(serverName: let server, helloMethod: let helloMethod):
+        case .sayHelloAfterTLS(serverName: let server, helloMethod: let helloMethod):
             out.writeString("\(helloMethod.rawValue) \(server)")
         case .mailFrom(let from):
             out.writeString("MAIL FROM:<\(from)>")

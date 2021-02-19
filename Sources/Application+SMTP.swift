@@ -1,18 +1,18 @@
 import Vapor
 
 extension Application {
-    public var smtp: Smtp {
+    public var smtp: SMTP {
         .init(application: self)
     }
 
-    public struct Smtp {
+    public struct SMTP {
         let application: Application
 
         struct ConfigurationKey: StorageKey {
-            typealias Value = SmtpServerConfiguration
+            typealias Value = SMTPServerConfiguration
         }
 
-        public var configuration: SmtpServerConfiguration {
+        public var configuration: SMTPServerConfiguration {
             get {
                 self.application.storage[ConfigurationKey.self] ?? .init()
             }

@@ -11,7 +11,7 @@ import Vapor
 /// **Set the SMTP server configuration (main.swift).**
 ///
 ///```swift
-/// import Smtp
+/// import SMTP
 ///
 /// var env = try Environment.detect()
 /// try LoggingSystem.bootstrap(from: &env)
@@ -72,17 +72,17 @@ import Vapor
 ///                |                                  |
 ///               \|/                                 |
 ///          +-----+--------------------------+       |
-///          |   InboundSmtpResponseDecoder   |       |
+///          |   InboundSMTPResponseDecoder   |       |
 ///          +-----+--------------------------+       |
 ///                |                                  |
 ///                |                                  |
 ///                |       +--------------------------+-----+
-///                |       |  OutboundSmtpRequestEncoder    |
+///                |       |  OutboundSMTPRequestEncoder    |
 ///                |       +--------------------------+-----+
 ///                |                                 /|\
 ///               \|/                                 |
 ///          +-----+----------------------------------+-----+
-///          |               StartTlsHandler                |
+///          |               StartTLSHandler                |
 ///          +-----+----------------------------------+-----+
 ///                |                                 /|\
 ///                |                                  |
@@ -94,10 +94,10 @@ import Vapor
 /// `OpenSSLClientHandler` is enabled only when `.ssl` secure is defined. For `.none` that
 /// handler is not added to the pipeline.
 ///
-/// `StartTlsHandler` is responsible for establishing SSL encryption after `STARTTLS`
+/// `StartTLSHandler` is responsible for establishing SSL encryption after `STARTTLS`
 /// command (this handler adds dynamically `OpenSSLClientHandler` to the pipeline if
 /// server supports that encryption.
-public extension Application.Smtp {
+public extension Application.SMTP {
     /// Sending an email.
     ///
     /// - parameters:
@@ -124,9 +124,9 @@ public extension Application.Smtp {
                     let defaultHandlers: [ChannelHandler] = [
                         DuplexMessagesHandler(handler: logHandler),
                         ByteToMessageHandler(InboundLineBasedFrameDecoder()),
-                        InboundSmtpResponseDecoder(),
-                        MessageToByteHandler(OutboundSmtpRequestEncoder()),
-                        StartTlsHandler(configuration: configuration, allDonePromise: emailSentPromise),
+                        InboundSMTPResponseDecoder(),
+                        MessageToByteHandler(OutboundSMTPRequestEncoder()),
+                        StartTLSHandler(configuration: configuration, allDonePromise: emailSentPromise),
                         InboundSendEmailHandler(configuration: configuration,
                                                 email: email,
                                                 allDonePromise: emailSentPromise)

@@ -1,46 +1,46 @@
 import NIO
 import NIOSSL
 
-internal final class StartTlsHandler: ChannelDuplexHandler, RemovableChannelHandler {
-    typealias InboundIn = SmtpResponse
-    typealias InboundOut = SmtpResponse
-    typealias OutboundIn = SmtpRequest
-    typealias OutboundOut = SmtpRequest
+internal final class StartTLSHandler: ChannelDuplexHandler, RemovableChannelHandler {
+    typealias InboundIn = SMTPResponse
+    typealias InboundOut = SMTPResponse
+    typealias OutboundIn = SMTPRequest
+    typealias OutboundOut = SMTPRequest
 
-    private let serverConfiguration: SmtpServerConfiguration
+    private let serverConfiguration: SMTPServerConfiguration
     private let allDonePromise: EventLoopPromise<Void>
-    private var waitingForStartTlsResponse = false
+    private var waitingForStartTLSResponse = false
 
-    init(configuration: SmtpServerConfiguration, allDonePromise: EventLoopPromise<Void>) {
+    init(configuration: SMTPServerConfiguration, allDonePromise: EventLoopPromise<Void>) {
         self.serverConfiguration = configuration
         self.allDonePromise = allDonePromise
     }
 
     func channelRead(context: ChannelHandlerContext, data: NIOAny) {
 
-        if self.startTlsDisabled() {
+        if self.startTLSDisabled() {
             context.fireChannelRead(data)
             return
         }
 
-        if waitingForStartTlsResponse {
-            self.waitingForStartTlsResponse = false
+        if waitingForStartTLSResponse {
+            self.waitingForStartTLSResponse = false
 
             let result = self.unwrapInboundIn(data)
             switch result {
             case .error(let message):
-                if self.serverConfiguration.secure == .startTls {
+                if self.serverConfiguration.secure == .startTLS {
                     // Fail only if tls is required.
-                    self.allDonePromise.fail(SmtpError(message))
+                    self.allDonePromise.fail(SMTPError(message))
                     return
                 }
 
-                // Tls is not required, we can continue without encryption.
-                let startTlsResult = self.wrapInboundOut(.ok(200, "STARTTLS is not supported"))
-                context.fireChannelRead(startTlsResult)
+                // TLS is not required, we can continue without encryption.
+                let startTLSResult = self.wrapInboundOut(.ok(200, "STARTTLS is not supported"))
+                context.fireChannelRead(startTLSResult)
                 return
             case .ok:
-                self.initializeTlsHandler(context: context, data: data)
+                self.initializeTLSHandler(context: context, data: data)
             }
         } else {
             context.fireChannelRead(data)
@@ -49,15 +49,15 @@ internal final class StartTlsHandler: ChannelDuplexHandler, RemovableChannelHand
 
     func write(context: ChannelHandlerContext, data: NIOAny, promise: EventLoopPromise<Void>?) {
 
-        if self.startTlsDisabled() {
+        if self.startTLSDisabled() {
             context.write(data, promise: promise)
             return
         }
 
         let command = self.unwrapOutboundIn(data)
         switch command {
-        case .startTls:
-            self.waitingForStartTlsResponse = true
+        case .startTLS:
+            self.waitingForStartTLSResponse = true
         default:
             break
         }
@@ -66,7 +66,7 @@ internal final class StartTlsHandler: ChannelDuplexHandler, RemovableChannelHand
         context.write(data, promise: promise)
     }
 
-    private func initializeTlsHandler(context: ChannelHandlerContext, data: NIOAny) {
+    private func initializeTLSHandler(context: ChannelHandlerContext, data: NIOAny) {
         do {
             let sslContext = try NIOSSLContext(configuration: .forClient())
             let sslHandler = try NIOSSLClientHandler(context: sslContext, serverHostname: self.serverConfiguration.hostname)
@@ -79,7 +79,7 @@ internal final class StartTlsHandler: ChannelDuplexHandler, RemovableChannelHand
         }
     }
 
-    private func startTlsDisabled() -> Bool {
-        return self.serverConfiguration.secure != .startTls && self.serverConfiguration.secure != .startTlsWhenAvailable
+    private func startTLSDisabled() -> Bool {
+        return self.serverConfiguration.secure != .startTLS && self.serverConfiguration.secure != .startTLSWhenAvailable
     }
 }
