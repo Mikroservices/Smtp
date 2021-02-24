@@ -286,17 +286,4 @@ final class SmtpTests: XCTestCase {
             XCTAssertTrue(try result.get())
         }.wait()
     }
-
-    static var allTests = [
-        ("testSendTextMessage", testSendTextMessage),
-        ("testSendHtmlMessage", testSendHtmlMessage),
-        ("testSendTextMessageWithoutNames", testSendTextMessageWithoutNames),
-        ("testSendTextMessageWithAttachments", testSendTextMessageWithAttachments),
-        ("testSendHtmlMessageWithAttachments", testSendHtmlMessageWithAttachments),
-        ("testSendTextMessageToMultipleRecipients", testSendTextMessageToMultipleRecipients),
-        ("testSendTextMessageWithCC", testSendTextMessageWithCC),
-        ("testSendTextMessageWithReplyTo", testSendTextMessageWithReplyTo),
-        ("testSendTextMessageOverSSL", testSendTextMessageOverSSL),
-        ("testSendTextMessageOverTSL", testSendTextMessageOverTSL)
-    ]
 }

@@ -5,13 +5,10 @@ on: push
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@master
-    - uses: YOCKOW/Action-setup-swift@master
-      with:
-        swift-version: '5.2'
     - shell: bash
       env:
         MAILTRAPUSER: ${{ secrets.MAILTRAPUSER }}
@@ -33,6 +30,6 @@ jobs:
       run: |
         sed -i -e 's/#GMAILPASS#/'"$GMAILPASS"'/g' Tests/SmtpTests/SmtpTests.swift
     - name: Build
-      run: swift build
+      run: swift build --enable-test-discovery
     - name: Tests
-      run: swift test
+      run: swift test --enable-test-discovery
