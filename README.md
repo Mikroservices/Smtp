@@ -116,3 +116,7 @@ Unit (integration) tests requires correct email credentials. Credentials are not
 If you want to run unit tests you have to use your [mailtrap](https://mailtrap.io) account and/or other email provider credentials.
 
 All you need to do is replacing the configuration section in `Tests/SmtpTests/SmtpTests.swift` file.
+
+## License
+
+This project is licensed under the terms of the MIT license.
