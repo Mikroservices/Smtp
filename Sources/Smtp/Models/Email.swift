@@ -1,7 +1,7 @@
 import Foundation
 import NIO
 
-public struct Email {
+public class Email {
     public let from: EmailAddress
     public let to: [EmailAddress]
     public let cc: [EmailAddress]?
@@ -10,12 +10,16 @@ public struct Email {
     public let body: String
     public let isBodyHtml: Bool
     public let replyTo: EmailAddress?
+    public let reference : String?
+    
+    public var uuid : String = ""
     internal var attachments: [Attachment] = []
 
     public init(from: EmailAddress,
                 to: [EmailAddress],
                 cc: [EmailAddress]? = nil,
                 bcc: [EmailAddress]? = nil,
+                reference : String? = nil,
                 subject: String,
                 body: String,
                 isBodyHtml: Bool = false,
@@ -29,9 +33,10 @@ public struct Email {
         self.body = body
         self.isBodyHtml = isBodyHtml
         self.replyTo = replyTo
+        self.reference = reference
     }
 
-    public mutating func addAttachment(_ attachment: Attachment) {
+    public func addAttachment(_ attachment: Attachment) {
         self.attachments.append(attachment)
     }
 }
@@ -54,6 +59,11 @@ extension Email {
             let ccAddresses = cc.map { self.formatMIME(emailAddress: $0) }.joined(separator: ", ")
             out.writeString("Cc: \(ccAddresses)\r\n")
         }
+        
+//        if let bcc = self.bcc {
+//            let bccAddresses = bcc.map { self.formatMIME(emailAddress: $0) }.joined(separator: ", ")
+//            out.writeString("Bcc: \(bccAddresses)\r\n")
+//        }
 
         if let replyTo = self.replyTo {
             out.writeString("Reply-to: \(self.formatMIME(emailAddress:replyTo))\r\n")
@@ -61,7 +71,12 @@ extension Email {
 
         out.writeString("Subject: \(self.subject)\r\n")
         out.writeString("Date: \(dateFormatted)\r\n")
-        out.writeString("Message-ID: <\(date.timeIntervalSince1970)\(self.from.address.drop { $0 != "@" })>\r\n")
+        self.uuid = "<\(date.timeIntervalSince1970)\(self.from.address.drop { $0 != "@" })>"
+        out.writeString("Message-ID: \(self.uuid)\r\n")
+        if let reference = self.reference {
+            out.writeString("In-Reply-To: \(reference)\r\n")
+            out.writeString("References: \(reference)\r\n")
+        }
 
         let boundary = self.boundary()
         if self.attachments.count > 0 {
