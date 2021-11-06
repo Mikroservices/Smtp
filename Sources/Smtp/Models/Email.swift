@@ -1,7 +1,7 @@
 import Foundation
 import NIO
 
-public class Email {
+public struct Email {
     public let from: EmailAddress
     public let to: [EmailAddress]
     public let cc: [EmailAddress]?
@@ -11,8 +11,9 @@ public class Email {
     public let isBodyHtml: Bool
     public let replyTo: EmailAddress?
     public let reference : String?
-    
-    public var uuid : String = ""
+    public let dateFormatted: String
+    public let uuid : String
+
     internal var attachments: [Attachment] = []
 
     public init(from: EmailAddress,
@@ -34,21 +35,23 @@ public class Email {
         self.isBodyHtml = isBodyHtml
         self.replyTo = replyTo
         self.reference = reference
+        
+        let date = Date()
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US")
+        dateFormatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss Z"
+
+        self.dateFormatted = dateFormatter.string(from: date)
+        self.uuid = "<\(date.timeIntervalSince1970)\(self.from.address.drop { $0 != "@" })>"
     }
 
-    public func addAttachment(_ attachment: Attachment) {
+    public mutating func addAttachment(_ attachment: Attachment) {
         self.attachments.append(attachment)
     }
 }
 
 extension Email {
     internal func write(to out: inout ByteBuffer) {
-        let date = Date()
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "en_US")
-
-        dateFormatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss Z"
-        let dateFormatted = dateFormatter.string(from: date)
 
         out.writeString("From: \(self.formatMIME(emailAddress: self.from))\r\n")
 
@@ -59,19 +62,13 @@ extension Email {
             let ccAddresses = cc.map { self.formatMIME(emailAddress: $0) }.joined(separator: ", ")
             out.writeString("Cc: \(ccAddresses)\r\n")
         }
-        
-//        if let bcc = self.bcc {
-//            let bccAddresses = bcc.map { self.formatMIME(emailAddress: $0) }.joined(separator: ", ")
-//            out.writeString("Bcc: \(bccAddresses)\r\n")
-//        }
 
         if let replyTo = self.replyTo {
             out.writeString("Reply-to: \(self.formatMIME(emailAddress:replyTo))\r\n")
         }
 
         out.writeString("Subject: \(self.subject)\r\n")
-        out.writeString("Date: \(dateFormatted)\r\n")
-        self.uuid = "<\(date.timeIntervalSince1970)\(self.from.address.drop { $0 != "@" })>"
+        out.writeString("Date: \(self.dateFormatted)\r\n")
         out.writeString("Message-ID: \(self.uuid)\r\n")
         if let reference = self.reference {
             out.writeString("In-Reply-To: \(reference)\r\n")

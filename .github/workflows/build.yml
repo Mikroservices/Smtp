@@ -8,8 +8,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@master
-    - uses: YOCKOW/Action-setup-swift@master
+    - uses: actions/checkout@main
+    - uses: YOCKOW/Action-setup-swift@main
       with:
         swift-version: '5.2'
     - shell: bash
