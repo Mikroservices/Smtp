@@ -11,7 +11,7 @@ jobs:
     - name: Install swift
       uses: YOCKOW/Action-setup-swift@v1
       with:
-        swift-version: '5.2'
+        swift-version: '5.3.3'
     - shell: bash
       env:
         MAILTRAPUSER: ${{ secrets.MAILTRAPUSER }}
