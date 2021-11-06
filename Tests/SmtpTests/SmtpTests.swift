@@ -13,20 +13,17 @@ final class SmtpTests: XCTestCase {
 
     let smtpConfiguration = SmtpServerConfiguration(hostname: "smtp.mailtrap.io",
                                                     port: 465,
-                                                    username: "#MAILTRAPUSER#",
-                                                    password: "#MAILTRAPPASS#",
+                                                    signInMethod: .credentials(username: "#MAILTRAPUSER#", password: "#MAILTRAPPASS#"),
                                                     secure: .none)
 
     let sslSmtpConfiguration = SmtpServerConfiguration(hostname: "smtp.gmail.com",
                                                        port: 465,
-                                                       username: "#GMAILUSER#",
-                                                       password: "#GMAILPASS#",
+                                                       signInMethod: .credentials(username: "#GMAILUSER#", password: "#GMAILPASS#"),
                                                        secure: .ssl)
 
     let tslSmtpConfiguration = SmtpServerConfiguration(hostname: "smtp.gmail.com",
                                                        port: 587,
-                                                       username: "#GMAILUSER#",
-                                                       password: "#GMAILPASS#",
+                                                       signInMethod: .credentials(username: "#GMAILUSER#", password: "#GMAILPASS#"),
                                                        secure: .startTls)
 
     let timestamp = DateFormatter.localizedString(from: Date(), dateStyle: .medium, timeStyle: .short)

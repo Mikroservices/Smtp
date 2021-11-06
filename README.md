@@ -53,8 +53,7 @@ let app = Application(env)
 defer { app.shutdown() }
 
 app.smtp.configuration.host = "smtp.server"
-app.smtp.configuration.username = "johndoe"
-app.smtp.configuration.password = "passw0rd"
+app.smtp.configuration.signInMethod = .credentials(username: "johndoe", password: "passw0rd")
 app.smtp.configuration.secure = .ssl
 
 try configure(app)
