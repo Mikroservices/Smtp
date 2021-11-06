@@ -8,8 +8,10 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@main
-    - uses: YOCKOW/Action-setup-swift@main
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Install swift
+      uses: YOCKOW/Action-setup-swift@v1
       with:
         swift-version: '5.2'
     - shell: bash
