@@ -81,8 +81,14 @@ internal final class InboundSendEmailHandler: ChannelInboundHandler {
                 self.send(context: context, command: .startTls)
                 self.currentlyWaitingFor = .okAfterStartTls
             } else {
-                self.send(context: context, command: .beginAuthentication)
-                self.currentlyWaitingFor = .okAfterAuthBegin
+                switch self.serverConfiguration.signInMethod {
+                case .credentials(_, _):
+                    self.send(context: context, command: .beginAuthentication)
+                    self.currentlyWaitingFor = .okAfterAuthBegin
+                case .anonymous:
+                    self.send(context: context, command: .mailFrom(self.email.from.address))
+                    self.currentlyWaitingFor = .okAfterMailFrom
+                }
             }
 
         case .okAfterStartTls:
@@ -92,11 +98,26 @@ internal final class InboundSendEmailHandler: ChannelInboundHandler {
             self.send(context: context, command: .beginAuthentication)
             self.currentlyWaitingFor = .okAfterAuthBegin
         case .okAfterAuthBegin:
-            self.send(context: context, command: .authUser(self.serverConfiguration.username))
-            self.currentlyWaitingFor = .okAfterUsername
+            
+            switch self.serverConfiguration.signInMethod {
+            case .credentials(let username, _):
+                self.send(context: context, command: .authUser(username))
+                self.currentlyWaitingFor = .okAfterUsername
+            case .anonymous:
+                self.allDonePromise.fail(SmtpError("After auth begin executed for anonymous sign in method"))
+                break;
+            }
+
         case .okAfterUsername:
-            self.send(context: context, command: .authPassword(self.serverConfiguration.password))
-            self.currentlyWaitingFor = .okAfterPassword
+            switch self.serverConfiguration.signInMethod {
+            case .credentials(_, let password):
+                self.send(context: context, command: .authPassword(password))
+                self.currentlyWaitingFor = .okAfterPassword
+            case .anonymous:
+                self.allDonePromise.fail(SmtpError("After user name executed for anonymous sign in method"))
+                break;
+            }
+
         case .okAfterPassword:
             self.send(context: context, command: .mailFrom(self.email.from.address))
             self.currentlyWaitingFor = .okAfterMailFrom

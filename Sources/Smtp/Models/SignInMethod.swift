@@ -3,6 +3,8 @@
 //  Copyright © 2021 Marcin Czachurski and the repository contributors.
 //  Licensed under the MIT License.
 //
-    
 
-import Foundation
+public enum SignInMethod {
+    case anonymous
+    case credentials(username: String, password: String)
+}
