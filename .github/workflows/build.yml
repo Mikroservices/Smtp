@@ -34,5 +34,5 @@ jobs:
         sed -i -e 's/#GMAILPASS#/'"$GMAILPASS"'/g' Tests/SmtpTests/SmtpTests.swift
     - name: Build
       run: swift build --enable-test-discovery
-    - name: Tests
-      run: swift test --enable-test-discovery
+#    - name: Tests
+#      run: swift test --enable-test-discovery
