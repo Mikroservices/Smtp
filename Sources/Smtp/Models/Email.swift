@@ -1,9 +1,15 @@
+//
+//  https://mczachurski.dev
+//  Copyright © 2021 Marcin Czachurski and the repository contributors.
+//  Licensed under the MIT License.
+//
+
 import Foundation
 import NIO
 
 public struct Email {
     public let from: EmailAddress
-    public let to: [EmailAddress]
+    public let to: [EmailAddress]?
     public let cc: [EmailAddress]?
     public let bcc: [EmailAddress]?
     public let subject: String
@@ -17,7 +23,7 @@ public struct Email {
     internal var attachments: [Attachment] = []
 
     public init(from: EmailAddress,
-                to: [EmailAddress],
+                to: [EmailAddress]? = nil,
                 cc: [EmailAddress]? = nil,
                 bcc: [EmailAddress]? = nil,
                 subject: String,
@@ -25,7 +31,11 @@ public struct Email {
                 isBodyHtml: Bool = false,
                 replyTo: EmailAddress? = nil,
                 reference : String? = nil
-    ) {
+    ) throws {
+        if (to?.isEmpty ?? true) == true && (cc?.isEmpty ?? true) == true && (bcc?.isEmpty ?? true) == true {
+            throw EmailError.recipientNotSpecified
+        }
+        
         self.from = from
         self.to = to
         self.cc = cc
@@ -55,8 +65,10 @@ extension Email {
 
         out.writeString("From: \(self.formatMIME(emailAddress: self.from))\r\n")
 
-        let toAddresses = self.to.map { self.formatMIME(emailAddress: $0) }.joined(separator: ", ")
-        out.writeString("To: \(toAddresses)\r\n")
+        if let to = self.to {
+            let toAddresses = to.map { self.formatMIME(emailAddress: $0) }.joined(separator: ", ")
+            out.writeString("To: \(toAddresses)\r\n")
+        }
 
         if let cc = self.cc {
             let ccAddresses = cc.map { self.formatMIME(emailAddress: $0) }.joined(separator: ", ")

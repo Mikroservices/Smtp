@@ -64,7 +64,7 @@ try app.run()
 Using SMTP client.
 
 ```swift
-let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
+let email = try! Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
                   to: [EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe")],
                   subject: "The subject (text)",
                   body: "This is email body.")
