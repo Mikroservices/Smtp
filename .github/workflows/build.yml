@@ -8,7 +8,10 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@main
+    - uses: YOCKOW/Action-setup-swift@main
+      with:
+        swift-version: '5.2'
     - shell: bash
       env:
         MAILTRAPUSER: ${{ secrets.MAILTRAPUSER }}

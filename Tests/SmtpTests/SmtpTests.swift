@@ -286,4 +286,52 @@ final class SmtpTests: XCTestCase {
             XCTAssertTrue(try result.get())
         }.wait()
     }
+    
+    func testSendBccTextMessage() throws {
+        let application = Application()
+        defer {
+            application.shutdown()
+        }
+
+        application.smtp.configuration = smtpConfiguration
+        let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
+                          to: [EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe")],
+                          cc: [EmailAddress(address: "july.doe@testxx.com", name: "July Doe"), EmailAddress(address: "viki.doe@testxx.com", name: "Viki Doe")],
+                          bcc:[EmailAddress(address: "hidden1@testxx.com", name: "Hidden One"), EmailAddress(address: "hidden2@testxx.com", name: "Hidden Two")],
+                          subject: "The subject (bcc) - \(timestamp)",
+                          body: "This is email body.")
+
+        let request = Request(application: application, on: application.eventLoopGroup.next())
+        try request.smtp.send(email) { message in
+            print(message)
+        }.flatMapThrowing { result in
+            XCTAssertTrue(try result.get())
+        }.wait()
+
+        sleep(3)
+    }
+    
+    func testSendInReplyToTextMessage() throws {
+        let application = Application()
+        defer {
+            application.shutdown()
+        }
+
+        application.smtp.configuration = smtpConfiguration
+        let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
+                          to: [EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe")],
+                          subject: "The subject (reference) - \(timestamp)",
+                          body: "This is email body.",
+                          reference: "<53455345@testxx.com>"
+        )
+
+        let request = Request(application: application, on: application.eventLoopGroup.next())
+        try request.smtp.send(email) { message in
+            print(message)
+        }.flatMapThrowing { result in
+            XCTAssertTrue(try result.get())
+        }.wait()
+
+        sleep(3)
+    }
 }

@@ -10,6 +10,10 @@ public struct Email {
     public let body: String
     public let isBodyHtml: Bool
     public let replyTo: EmailAddress?
+    public let reference : String?
+    public let dateFormatted: String
+    public let uuid : String
+
     internal var attachments: [Attachment] = []
 
     public init(from: EmailAddress,
@@ -19,7 +23,8 @@ public struct Email {
                 subject: String,
                 body: String,
                 isBodyHtml: Bool = false,
-                replyTo: EmailAddress? = nil
+                replyTo: EmailAddress? = nil,
+                reference : String? = nil
     ) {
         self.from = from
         self.to = to
@@ -29,6 +34,15 @@ public struct Email {
         self.body = body
         self.isBodyHtml = isBodyHtml
         self.replyTo = replyTo
+        self.reference = reference
+        
+        let date = Date()
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US")
+        dateFormatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss Z"
+
+        self.dateFormatted = dateFormatter.string(from: date)
+        self.uuid = "<\(date.timeIntervalSince1970)\(self.from.address.drop { $0 != "@" })>"
     }
 
     public mutating func addAttachment(_ attachment: Attachment) {
@@ -38,12 +52,6 @@ public struct Email {
 
 extension Email {
     internal func write(to out: inout ByteBuffer) {
-        let date = Date()
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "en_US")
-
-        dateFormatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss Z"
-        let dateFormatted = dateFormatter.string(from: date)
 
         out.writeString("From: \(self.formatMIME(emailAddress: self.from))\r\n")
 
@@ -60,8 +68,13 @@ extension Email {
         }
 
         out.writeString("Subject: \(self.subject)\r\n")
-        out.writeString("Date: \(dateFormatted)\r\n")
-        out.writeString("Message-ID: <\(date.timeIntervalSince1970)\(self.from.address.drop { $0 != "@" })>\r\n")
+        out.writeString("Date: \(self.dateFormatted)\r\n")
+        out.writeString("Message-ID: \(self.uuid)\r\n")
+
+        if let reference = self.reference {
+            out.writeString("In-Reply-To: \(reference)\r\n")
+            out.writeString("References: \(reference)\r\n")
+        }
 
         let boundary = self.boundary()
         if self.attachments.count > 0 {
