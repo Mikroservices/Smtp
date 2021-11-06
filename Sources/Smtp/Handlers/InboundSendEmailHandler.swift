@@ -35,9 +35,11 @@ internal final class InboundSendEmailHandler: ChannelInboundHandler {
         self.serverConfiguration = configuration
 
         self.recipients = self.email.to
+
         if let cc = self.email.cc {
             self.recipients += cc
         }
+
         if let bcc = self.email.bcc {
             self.recipients += bcc
         }

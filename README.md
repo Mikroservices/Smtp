@@ -21,8 +21,8 @@ Features:
 - [x] STARTTLS support
 - [x] Multiple recipients & CC
 - [x] Reply to
-- [ ] BCC fields
-- [ ] Multiple emails sent at the same time
+- [x] BCC fields
+- [ ] Multiple emails sent at the same time (one SMTP connection)
 
 ## Getting started
 
@@ -30,7 +30,7 @@ You need to add library to `Package.swift` file:
 
  - add package to dependencies:
 ```swift
-.package(url: "https://github.com/Mikroservices/Smtp.git", from: "2.0.0")
+.package(url: "https://github.com/Mikroservices/Smtp.git", from: "2.2.0")
 ```
 
 - and add product to your target:
