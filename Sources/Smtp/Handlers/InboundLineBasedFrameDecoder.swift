@@ -1,3 +1,9 @@
+//
+//  https://mczachurski.dev
+//  Copyright © 2021 Marcin Czachurski and the repository contributors.
+//  Licensed under the MIT License.
+//
+
 import NIO
 
 /// A decoder that splits incoming `ByteBuffer`s around line end

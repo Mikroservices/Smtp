@@ -1,3 +1,9 @@
+//
+//  https://mczachurski.dev
+//  Copyright © 2021 Marcin Czachurski and the repository contributors.
+//  Licensed under the MIT License.
+//
+
 import XCTest
 import NIO
 import Vapor
@@ -32,7 +38,7 @@ final class SmtpTests: XCTestCase {
         }
 
         application.smtp.configuration = smtpConfiguration
-        let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
+        let email = try! Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
                           to: [EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe")],
                           subject: "The subject (text) - \(timestamp)",
                           body: "This is email body.")
@@ -54,7 +60,7 @@ final class SmtpTests: XCTestCase {
         }
 
         application.smtp.configuration = smtpConfiguration
-        let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
+        let email = try! Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
                           to: [EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe")],
                           subject: "The subject (text) - \(timestamp)",
                           body: "This is email body.")
@@ -75,7 +81,7 @@ final class SmtpTests: XCTestCase {
         }
 
         application.smtp.configuration = smtpConfiguration
-        let email = Email(from: EmailAddress(address: "john.doe@testxx.com"),
+        let email = try! Email(from: EmailAddress(address: "john.doe@testxx.com"),
                           to: [EmailAddress(address: "ben.doe@testxx.com")],
                           subject: "The subject (without names) - \(timestamp)",
                           body: "This is email body.")
@@ -97,7 +103,7 @@ final class SmtpTests: XCTestCase {
         }
 
         application.smtp.configuration = smtpConfiguration
-        let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
+        let email = try! Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
                           to: [EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe")],
                           subject: "The subject (html) - \(timestamp)",
                           body: "<html><body><h1>This is email content!</h1></body></html>",
@@ -120,7 +126,7 @@ final class SmtpTests: XCTestCase {
         }
 
         application.smtp.configuration = smtpConfiguration
-        var email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
+        var email = try! Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
                           to: [EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe")],
                           subject: "The subject (text) - \(timestamp)",
                           body: "This is email body.")
@@ -145,7 +151,7 @@ final class SmtpTests: XCTestCase {
         }
 
         application.smtp.configuration = smtpConfiguration
-        var email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
+        var email = try! Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
                           to: [EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe")],
                           subject: "The subject (html) - \(timestamp)",
                           body: "<html><body><h1>This is email content!</h1></body></html>",
@@ -171,7 +177,7 @@ final class SmtpTests: XCTestCase {
         }
 
         application.smtp.configuration = smtpConfiguration
-        let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
+        let email = try! Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
                           to: [
                             EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe"),
                             EmailAddress(address: "anton.doe@testxx.com", name: "Anton Doe")
@@ -196,7 +202,7 @@ final class SmtpTests: XCTestCase {
         }
 
         application.smtp.configuration = smtpConfiguration
-        let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
+        let email = try! Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
                           to: [
                             EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe"),
                             EmailAddress(address: "anton.doe@testxx.com", name: "Anton Doe")
@@ -225,7 +231,7 @@ final class SmtpTests: XCTestCase {
         }
 
         application.smtp.configuration = smtpConfiguration
-        let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
+        let email = try! Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
                           to: [EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe")],
                           subject: "The subject (reply-to) - \(timestamp)",
                           body: "This is email body.",
@@ -248,7 +254,7 @@ final class SmtpTests: XCTestCase {
         }
         
         application.smtp.configuration = sslSmtpConfiguration
-        var email = Email(from: EmailAddress(address: "smtp.mikroservice@gmail.com", name: "John Doe"),
+        var email = try! Email(from: EmailAddress(address: "smtp.mikroservice@gmail.com", name: "John Doe"),
                           to: [EmailAddress(address: "smtp.mikroservice@outlook.com", name: "Ben Doe")],
                           subject: "The subject (over SSL) - \(timestamp)",
                           body: "This is email body.")
@@ -271,7 +277,7 @@ final class SmtpTests: XCTestCase {
         }
 
         application.smtp.configuration = tslSmtpConfiguration
-        var email = Email(from: EmailAddress(address: "smtp.mikroservice@gmail.com", name: "John Doe"),
+        var email = try! Email(from: EmailAddress(address: "smtp.mikroservice@gmail.com", name: "John Doe"),
                           to: [EmailAddress(address: "smtp.mikroservice@outlook.com", name: "Ben Doe")],
                           subject: "The subject (over TSL) - \(timestamp)",
                           body: "This is email body.")
@@ -294,7 +300,7 @@ final class SmtpTests: XCTestCase {
         }
 
         application.smtp.configuration = smtpConfiguration
-        let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
+        let email = try! Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
                           to: [EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe")],
                           cc: [EmailAddress(address: "july.doe@testxx.com", name: "July Doe"), EmailAddress(address: "viki.doe@testxx.com", name: "Viki Doe")],
                           bcc:[EmailAddress(address: "hidden1@testxx.com", name: "Hidden One"), EmailAddress(address: "hidden2@testxx.com", name: "Hidden Two")],
@@ -318,7 +324,7 @@ final class SmtpTests: XCTestCase {
         }
 
         application.smtp.configuration = smtpConfiguration
-        let email = Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
+        let email = try! Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
                           to: [EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe")],
                           subject: "The subject (reference) - \(timestamp)",
                           body: "This is email body.",
@@ -333,5 +339,39 @@ final class SmtpTests: XCTestCase {
         }.wait()
 
         sleep(3)
+    }
+    
+    func testSendOnlyBccTextMessage() throws {
+        let application = Application()
+        defer {
+            application.shutdown()
+        }
+
+        application.smtp.configuration = smtpConfiguration
+        let email = try! Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
+                               bcc:[EmailAddress(address: "hidden1@testxx.com", name: "Hidden One"), EmailAddress(address: "hidden2@testxx.com", name: "Hidden Two")],
+                               subject: "The subject (only bcc) - \(timestamp)",
+                               body: "This is email body.")
+
+        let request = Request(application: application, on: application.eventLoopGroup.next())
+        try request.smtp.send(email) { message in
+            print(message)
+        }.flatMapThrowing { result in
+            XCTAssertTrue(try result.get())
+        }.wait()
+
+        sleep(3)
+    }
+    
+    func testEmailWithoutRecipientsCannotBeInitialized() throws {
+        XCTAssertThrowsError(
+            try Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
+                      subject: "The subject (reference) - \(timestamp)",
+                      body: "This is email body.",
+                      reference: "<53455345@testxx.com>"
+            )
+        ) { error in
+            XCTAssertEqual(error as! EmailError, EmailError.recipientNotSpecified)
+        }
     }
 }

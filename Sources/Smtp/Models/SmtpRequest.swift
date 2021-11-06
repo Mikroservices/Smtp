@@ -1,3 +1,9 @@
+//
+//  https://mczachurski.dev
+//  Copyright © 2021 Marcin Czachurski and the repository contributors.
+//  Licensed under the MIT License.
+//
+
 internal enum SmtpRequest {
     case sayHello(serverName: String, helloMethod: HelloMethod)
     case startTls

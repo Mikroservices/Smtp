@@ -1,3 +1,9 @@
+//
+//  https://mczachurski.dev
+//  Copyright © 2021 Marcin Czachurski and the repository contributors.
+//  Licensed under the MIT License.
+//
+
 import NIO
 import NIOSSL
 
@@ -27,14 +33,16 @@ internal final class InboundSendEmailHandler: ChannelInboundHandler {
     private var email: Email
     private let serverConfiguration: SmtpServerConfiguration
     private let allDonePromise: EventLoopPromise<Void>
-    private var recipients: [EmailAddress]
+    private var recipients: [EmailAddress] = []
 
     init(configuration: SmtpServerConfiguration, email: Email, allDonePromise: EventLoopPromise<Void>) {
         self.email = email
         self.allDonePromise = allDonePromise
         self.serverConfiguration = configuration
 
-        self.recipients = self.email.to
+        if let to = self.email.to {
+            self.recipients += to
+        }
 
         if let cc = self.email.cc {
             self.recipients += cc
