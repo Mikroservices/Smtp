@@ -24,7 +24,7 @@ internal final class InboundSendEmailHandler: ChannelInboundHandler {
     }
 
     private var currentlyWaitingFor = Expect.initialMessageFromServer
-    private let email: Email
+    private var email: Email
     private let serverConfiguration: SmtpServerConfiguration
     private let allDonePromise: EventLoopPromise<Void>
     private var recipients: [EmailAddress]
@@ -37,6 +37,9 @@ internal final class InboundSendEmailHandler: ChannelInboundHandler {
         self.recipients = self.email.to
         if let cc = self.email.cc {
             self.recipients += cc
+        }
+        if let bcc = self.email.bcc {
+            self.recipients += bcc
         }
     }
 
