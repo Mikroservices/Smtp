@@ -31,7 +31,7 @@ public enum SmtpSecureChannel {
         switch self {
         case .ssl:
             do {
-                let sslContext = try NIOSSLContext(configuration: .forClient())
+                let sslContext = try NIOSSLContext(configuration: .makeClientConfiguration())
                 let sslHandler = try NIOSSLClientHandler(context: sslContext, serverHostname: hostname)
                 return channel.pipeline.addHandler(sslHandler)
             } catch {

@@ -74,7 +74,7 @@ internal final class StartTlsHandler: ChannelDuplexHandler, RemovableChannelHand
 
     private func initializeTlsHandler(context: ChannelHandlerContext, data: NIOAny) {
         do {
-            let sslContext = try NIOSSLContext(configuration: .forClient())
+            let sslContext = try NIOSSLContext(configuration: .makeClientConfiguration())
             let sslHandler = try NIOSSLClientHandler(context: sslContext, serverHostname: self.serverConfiguration.hostname)
             _ = context.channel.pipeline.addHandler(sslHandler, name: "NIOSSLClientHandler", position: .first)
 
