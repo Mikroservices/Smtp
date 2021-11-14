@@ -155,3 +155,21 @@ public extension Application.Smtp {
         }
     }
 }
+
+#if compiler(>=5.5) && canImport(_Concurrency)
+
+@available(macOS 12, iOS 15, watchOS 8, tvOS 15, *)
+public extension Application.Smtp {
+    func send(_ email: Email, eventLoop: EventLoop? = nil, logHandler: ((String) -> Void)? = nil) async throws {
+        let result = try await self.send(email, eventLoop: eventLoop, logHandler: logHandler).get()
+
+        switch result {
+        case .success(_):
+            break
+        case .failure(let error):
+            throw error
+        }
+    }
+}
+
+#endif

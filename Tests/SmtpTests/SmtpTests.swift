@@ -371,4 +371,32 @@ final class SmtpTests: XCTestCase {
             XCTAssertEqual(error as! EmailError, EmailError.recipientNotSpecified)
         }
     }
+    
+#if compiler(>=5.5) && canImport(_Concurrency)
+
+    @available(macOS 12, iOS 15, watchOS 8, tvOS 15, *)
+    func testSendTextMessageWithAwaitFunction() async {
+        let application = Application()
+        defer {
+            application.shutdown()
+        }
+
+        application.smtp.configuration = smtpConfiguration
+        let email = try! Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
+                          to: [EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe")],
+                          subject: "The subject (text) - \(timestamp)",
+                          body: "This is email body.")
+        
+        let request = Request(application: application, on: application.eventLoopGroup.next())
+        do {
+            try await request.smtp.send(email)
+        }
+        catch {
+            XCTFail("Error during send email")
+        }
+
+        sleep(3)
+    }
+
+#endif
 }

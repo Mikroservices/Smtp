@@ -14,6 +14,7 @@ This framework has dependencies only to `Vapor` and `SwiftNIO` packages.
 Features:
 
 - [x] Vapor provider/service
+- [x] async/await support
 - [x] SwiftNIO Support
 - [x] Text/HTML
 - [x] Attachments
@@ -41,7 +42,7 @@ You need to add library to `Package.swift` file:
 ])
 ```
 
-Set the SMTP server configuration (e.g. in `main.swift` file).
+**Set the SMTP server configuration (e.g. in `main.swift` file)**
 
 ```swift
 import Smtp
@@ -60,7 +61,7 @@ try configure(app)
 try app.run()
 ```
 
-Using SMTP client.
+**Using SMTP client (EventLoopFuture)**
 
 ```swift
 let email = try! Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
@@ -85,6 +86,34 @@ app.smtp.send(email).map { result in
     ...
 }
 ```
+
+**Using SMPT client (async/await)**
+
+You have to set macOS 12 as a target in `Package.swift` file (and tool version 5.5).
+
+```swift
+    platforms: [
+        .macOS(.v12)
+    ],
+```
+
+Then you can use async/await alternatives of SMTP methods. 
+
+```swift
+let email = try! Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
+                  to: [EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe")],
+                  subject: "The subject (text)",
+                  body: "This is email body.")
+
+try await request.smtp.send(email)
+```
+
+Also you can send emails directly via `application` class.
+
+```swift
+try await app.smtp.send(email)
+```
+
 
 ## Troubleshoots
 
