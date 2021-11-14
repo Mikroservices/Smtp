@@ -31,7 +31,7 @@ You need to add library to `Package.swift` file:
 
  - add package to dependencies:
 ```swift
-.package(url: "https://github.com/Mikroservices/Smtp.git", from: "2.2.0")
+.package(url: "https://github.com/Mikroservices/Smtp.git", from: "3.0.0")
 ```
 
 - and add product to your target:
