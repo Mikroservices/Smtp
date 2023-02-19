@@ -108,7 +108,8 @@ extension Email {
                 out.writeString("\(self.body)\r\n")
                 out.writeString("--\(boundary)\r\n")
             } else {
-                out.writeString("--\(boundary)\r\n\r\n")
+                out.writeString("--\(boundary)\r\n")
+                out.writeString("Content-Type: text/plain; charset=\"UTF-8\"\r\n\r\n")
                 out.writeString("\(self.body)\r\n")
                 out.writeString("--\(boundary)\r\n")
             }
