@@ -102,17 +102,14 @@ extension Email {
 
         if self.attachments.count > 0 {
 
+            out.writeString("--\(boundary)\r\n")
             if self.isBodyHtml {
-                out.writeString("--\(boundary)\r\n")
                 out.writeString("Content-Type: text/html; charset=\"UTF-8\"\r\n\r\n")
-                out.writeString("\(self.body)\r\n")
-                out.writeString("--\(boundary)\r\n")
             } else {
-                out.writeString("--\(boundary)\r\n")
                 out.writeString("Content-Type: text/plain; charset=\"UTF-8\"\r\n\r\n")
-                out.writeString("\(self.body)\r\n\r\n")
-                out.writeString("--\(boundary)\r\n")
             }
+            out.writeString("\(self.body)\r\n\r\n")
+            out.writeString("--\(boundary)\r\n")
 
             for attachment in self.attachments {
                 out.writeString("Content-type: \(attachment.contentType)\r\n")
