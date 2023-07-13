@@ -16,9 +16,9 @@ public struct Email {
     public let body: String
     public let isBodyHtml: Bool
     public let replyTo: EmailAddress?
-    public let reference : String?
+    public let reference: String?
     public let dateFormatted: String
-    public let uuid : String
+    public let uuid: String
 
     internal var attachments: [Attachment] = []
 
@@ -30,7 +30,7 @@ public struct Email {
                 body: String,
                 isBodyHtml: Bool = false,
                 replyTo: EmailAddress? = nil,
-                reference : String? = nil
+                reference: String? = nil
     ) throws {
         if (to?.isEmpty ?? true) == true && (cc?.isEmpty ?? true) == true && (bcc?.isEmpty ?? true) == true {
             throw EmailError.recipientNotSpecified
@@ -62,7 +62,6 @@ public struct Email {
 
 extension Email {
     internal func write(to out: inout ByteBuffer) {
-
         out.writeString("From: \(self.formatMIME(emailAddress: self.from))\r\n")
 
         if let to = self.to {
@@ -100,27 +99,24 @@ extension Email {
             out.writeString("Mime-Version: 1.0\r\n\r\n")
         }
 
+        out.writeString("--\(boundary)\r\n")
+
+        if self.isBodyHtml {
+            out.writeString("Content-Type: text/html; charset=\"UTF-8\"\r\n\r\n")
+        } else {
+            out.writeString("Content-Type: text/plain; charset=\"UTF-8\"\r\n\r\n")
+        }
+        out.writeString("\(self.body)\r\n\r\n")
+
         if self.attachments.count > 0 {
-
-            out.writeString("--\(boundary)\r\n")
-            if self.isBodyHtml {
-                out.writeString("Content-Type: text/html; charset=\"UTF-8\"\r\n\r\n")
-            } else {
-                out.writeString("Content-Type: text/plain; charset=\"UTF-8\"\r\n\r\n")
-            }
-            out.writeString("\(self.body)\r\n\r\n")
-            out.writeString("--\(boundary)\r\n")
-
             for attachment in self.attachments {
+                out.writeString("--\(boundary)\r\n")
                 out.writeString("Content-type: \(attachment.contentType)\r\n")
                 out.writeString("Content-Transfer-Encoding: base64\r\n")
                 out.writeString("Content-Disposition: attachment; filename=\"\(attachment.name)\"\r\n\r\n")
                 out.writeString("\(attachment.data.base64EncodedString())\r\n")
-                out.writeString("--\(boundary)\r\n")
             }
-
-        } else {
-            out.writeString(self.body)
+            out.writeString("--\(boundary)--\r\n")
         }
 
         out.writeString("\r\n.")
@@ -138,3 +134,4 @@ extension Email {
         }
     }
 }
+
