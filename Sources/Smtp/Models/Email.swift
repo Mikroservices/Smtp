@@ -122,10 +122,10 @@ extension Email {
             }
 
         } else {
-            out.writeString(self.body)
+            out.writeString("\(self.body)\r\n")
         }
 
-        out.writeString("\r\n.")
+        out.writeString(".")
     }
 
     private func boundary() -> String {
