@@ -41,10 +41,15 @@ public struct Email {
         self.cc = cc
         self.bcc = bcc
         self.subject = subject
-        self.body = body
+        
         self.isBodyHtml = isBodyHtml
         self.replyTo = replyTo
         self.reference = reference
+        
+        // Body have to contains POSIX new lines.
+        self.body = body
+            .replacingOccurrences(of: "\r\n", with: "\n")
+            .replacingOccurrences(of: "\n", with: "\r\n")
         
         let date = Date()
         let dateFormatter = DateFormatter()
