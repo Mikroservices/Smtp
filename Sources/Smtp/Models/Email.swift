@@ -14,6 +14,7 @@ public struct Email {
     public let bcc: [EmailAddress]?
     public let subject: String
     public let body: String
+    public let plain: String?
     public let isBodyHtml: Bool
     public let replyTo: EmailAddress?
     public let reference : String?
@@ -28,6 +29,7 @@ public struct Email {
                 bcc: [EmailAddress]? = nil,
                 subject: String,
                 body: String,
+                plain: String? = nil,
                 isBodyHtml: Bool = false,
                 replyTo: EmailAddress? = nil,
                 reference : String? = nil
@@ -41,6 +43,7 @@ public struct Email {
         self.cc = cc
         self.bcc = bcc
         self.subject = subject
+        self.plain = plain
         
         self.isBodyHtml = isBodyHtml
         self.replyTo = replyTo
@@ -97,6 +100,9 @@ extension Email {
         if self.attachments.count > 0 {
             out.writeString("Content-type: multipart/mixed; boundary=\"\(boundary)\"\r\n")
             out.writeString("Mime-Version: 1.0\r\n\r\n")
+        } else if self.isBodyHtml && self.plain != nil {
+                out.writeString("Content-type: multipart/alternative; boundary=\"\(boundary)\"\r\n")
+                out.writeString("Mime-Version: 1.0\r\n\r\n")
         } else if self.isBodyHtml {
             out.writeString("Content-Type: text/html; charset=\"UTF-8\"\r\n")
             out.writeString("Mime-Version: 1.0\r\n\r\n")
@@ -105,9 +111,16 @@ extension Email {
             out.writeString("Mime-Version: 1.0\r\n\r\n")
         }
 
-        if self.attachments.count > 0 {
+        if self.attachments.count > 0 || (self.isBodyHtml && self.plain != nil) {
 
             if self.isBodyHtml {
+                if let text = self.plain {
+                    out.writeString("--\(boundary)\r\n")
+                    out.writeString("Content-Type: text/plain; charset=\"UTF-8\"\r\n\r\n")
+                    out.writeString("\(text)\r\n\r\n")
+                    out.writeString("--\(boundary)\r\n")
+                }
+                
                 out.writeString("--\(boundary)\r\n")
                 out.writeString("Content-Type: text/html; charset=\"UTF-8\"\r\n\r\n")
                 out.writeString("\(self.body)\r\n")
