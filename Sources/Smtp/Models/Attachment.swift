@@ -12,7 +12,7 @@ public struct Attachment {
     public let data: Data
     public let contentId: String?
 
-    public init(name: String, contentType: String, data: Data,  contentId: String? = nil) {
+    public init(name: String, contentType: String, data: Data, contentId: String? = nil) {
         self.name = name
         self.contentType = contentType
         self.data = data
