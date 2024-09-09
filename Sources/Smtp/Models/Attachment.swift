@@ -10,12 +10,12 @@ public struct Attachment {
     public let name: String
     public let contentType: String
     public let data: Data
-    public let contentID: String?
+    public let contentId: String?
 
-    public init(name: String, contentType: String, data: Data,  contentID: String? = nil) {
+    public init(name: String, contentType: String, data: Data,  contentId: String? = nil) {
         self.name = name
         self.contentType = contentType
         self.data = data
-        self.contentID = contentID
+        self.contentId = contentId
     }
 }

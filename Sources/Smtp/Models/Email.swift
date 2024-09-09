@@ -135,9 +135,11 @@ extension Email {
             for (index, attachment) in self.attachments.enumerated() {
                 out.writeString("Content-type: \(attachment.contentType)\r\n")
                 out.writeString("Content-Transfer-Encoding: base64\r\n")
-                if let contentID = attachment.contentID  {
-                    out.writeString("Content-ID: \(contentID)\r\n")
+
+                if let contentId = attachment.contentId  {
+                    out.writeString("Content-ID: <\(contentId)>\r\n")
                 }
+
                 out.writeString("Content-Disposition: attachment; filename=\"\(attachment.name)\"\r\n\r\n")
                 out.writeString("\(attachment.data.base64EncodedString())\r\n")
                 
