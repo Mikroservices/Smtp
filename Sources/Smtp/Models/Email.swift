@@ -117,19 +117,18 @@ extension Email {
                 if let text = self.plain {
                     out.writeString("--\(boundary)\r\n")
                     out.writeString("Content-Type: text/plain; charset=\"UTF-8\"\r\n\r\n")
-                    out.writeString("\(text)\r\n\r\n")
-                    out.writeString("--\(boundary)\r\n")
+                    out.writeString("\(text)\r\n")
                 }
                 
                 out.writeString("--\(boundary)\r\n")
                 out.writeString("Content-Type: text/html; charset=\"UTF-8\"\r\n\r\n")
                 out.writeString("\(self.body)\r\n")
-                out.writeString("--\(boundary)\r\n")
+                out.writeString("--\(boundary)\(self.attachments.count == 0 ? "--" : "")\r\n")
             } else {
                 out.writeString("--\(boundary)\r\n")
                 out.writeString("Content-Type: text/plain; charset=\"UTF-8\"\r\n\r\n")
-                out.writeString("\(self.body)\r\n\r\n")
-                out.writeString("--\(boundary)\r\n")
+                out.writeString("\(self.body)\r\n")
+                out.writeString("--\(boundary)\(self.attachments.count == 0 ? "--" : "")\r\n")
             }
 
             for (index, attachment) in self.attachments.enumerated() {
