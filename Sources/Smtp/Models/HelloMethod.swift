@@ -4,7 +4,7 @@
 //  Licensed under the MIT License.
 //
 
-public enum HelloMethod: String {
+public enum HelloMethod: String, Sendable {
     case helo = "HELO"
     case ehlo = "EHLO"
 }
