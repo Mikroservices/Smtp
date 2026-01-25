@@ -8,7 +8,7 @@ import Vapor
 import NIO
 import NIOSSL
 
-public enum SmtpSecureChannel {
+public enum SmtpSecureChannel: Sendable {
 
     /// Communication without any encryption (even password is send as a plain text).
     case none

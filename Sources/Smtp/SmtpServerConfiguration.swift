@@ -7,7 +7,7 @@
 import NIO
 import Vapor
 
-public struct SmtpServerConfiguration {
+public struct SmtpServerConfiguration: Sendable {
     public var hostname: String
     public var port: Int
     public var secure: SmtpSecureChannel
