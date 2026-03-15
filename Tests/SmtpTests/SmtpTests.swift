@@ -28,10 +28,12 @@ final class SmtpTests: XCTestCase {
 
     let timestamp = DateFormatter.localizedString(from: Date(), dateStyle: .medium, timeStyle: .short)
 
-    func testSendTextMessage() throws {
-        let application = Application()
+    func testSendTextMessage() async throws {
+        let application = try await Application.make(.testing)
         defer {
-            application.shutdown()
+            Task {
+                try? await application.asyncShutdown()
+            }
         }
 
         application.smtp.configuration = smtpConfiguration
@@ -41,19 +43,19 @@ final class SmtpTests: XCTestCase {
                           body: "This is email body.")
         
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.smtp.send(email) { message in
+        try await request.smtp.send(email, logHandler: { message in
             print(message)
-        }.flatMapThrowing { result in
-            XCTAssertTrue(try result.get())
-        }.wait()
+        })
 
         sleep(3)
     }
 
-    func testSendTextMessageViaApplication() throws {
-        let application = Application()
+    func testSendTextMessageViaApplication() async throws {
+        let application = try await Application.make(.testing)
         defer {
-            application.shutdown()
+            Task {
+                try? await application.asyncShutdown()
+            }
         }
 
         application.smtp.configuration = smtpConfiguration
@@ -62,19 +64,19 @@ final class SmtpTests: XCTestCase {
                           subject: "The subject (text) - \(timestamp)",
                           body: "This is email body.")
         
-        try application.smtp.send(email) { message in
+        try await application.smtp.send(email, logHandler: { message in
             print(message)
-        }.flatMapThrowing { result in
-            XCTAssertTrue(try result.get())
-        }.wait()
+        })
 
         sleep(3)
     }
     
-    func testSendTextMessageWithoutNames() throws {
-        let application = Application()
+    func testSendTextMessageWithoutNames() async throws {
+        let application = try await Application.make(.testing)
         defer {
-            application.shutdown()
+            Task {
+                try? await application.asyncShutdown()
+            }
         }
 
         application.smtp.configuration = smtpConfiguration
@@ -84,19 +86,19 @@ final class SmtpTests: XCTestCase {
                           body: "This is email body.")
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.smtp.send(email) { message in
+        try await request.smtp.send(email, logHandler: { message in
             print(message)
-        }.flatMapThrowing { result in
-            XCTAssertTrue(try result.get())
-        }.wait()
+        })
         
         sleep(3)
     }
 
-    func testSendHtmlMessage() throws {
-        let application = Application()
+    func testSendHtmlMessage() async throws {
+        let application = try await Application.make(.testing)
         defer {
-            application.shutdown()
+            Task {
+                try? await application.asyncShutdown()
+            }
         }
 
         application.smtp.configuration = smtpConfiguration
@@ -107,19 +109,19 @@ final class SmtpTests: XCTestCase {
                           isBodyHtml: true)
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.smtp.send(email) { message in
+        try await request.smtp.send(email, logHandler: { message in
             print(message)
-        }.flatMapThrowing { result in
-            XCTAssertTrue(try result.get())
-        }.wait()
+        })
         
         sleep(3)
     }
 
-    func testSendTextMessageWithAttachments() throws {
-        let application = Application()
+    func testSendTextMessageWithAttachments() async throws {
+        let application = try await Application.make(.testing)
         defer {
-            application.shutdown()
+            Task {
+                try? await application.asyncShutdown()
+            }
         }
 
         application.smtp.configuration = smtpConfiguration
@@ -132,19 +134,19 @@ final class SmtpTests: XCTestCase {
         email.addAttachment(Attachment(name: "image.png", contentType: "image/png", data: Attachments.image()))
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.smtp.send(email) { message in
+        try await request.smtp.send(email, logHandler: { message in
             print(message)
-        }.flatMapThrowing { result in
-            XCTAssertTrue(try result.get())
-        }.wait()
+        })
         
         sleep(3)
     }
 
-    func testSendHtmlMessageWithAttachments() throws {
-        let application = Application()
+    func testSendHtmlMessageWithAttachments() async throws {
+        let application = try await Application.make(.testing)
         defer {
-            application.shutdown()
+            Task {
+                try? await application.asyncShutdown()
+            }
         }
 
         application.smtp.configuration = smtpConfiguration
@@ -158,19 +160,19 @@ final class SmtpTests: XCTestCase {
         email.addAttachment(Attachment(name: "image.png", contentType: "image/png", data: Attachments.image()))
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.smtp.send(email) { message in
+        try await request.smtp.send(email, logHandler: { message in
             print(message)
-        }.flatMapThrowing { result in
-            XCTAssertTrue(try result.get())
-        }.wait()
+        })
         
         sleep(3)
     }
 
-    func testSendTextMessageToMultipleRecipients() throws {
-        let application = Application()
+    func testSendTextMessageToMultipleRecipients() async throws {
+        let application = try await Application.make(.testing)
         defer {
-            application.shutdown()
+            Task {
+                try? await application.asyncShutdown()
+            }
         }
 
         application.smtp.configuration = smtpConfiguration
@@ -183,19 +185,19 @@ final class SmtpTests: XCTestCase {
                           body: "This is email body.")
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.smtp.send(email) { message in
+        try await request.smtp.send(email, logHandler: { message in
             print(message)
-        }.flatMapThrowing { result in
-            XCTAssertTrue(try result.get())
-        }.wait()
+        })
         
         sleep(3)
     }
 
-    func testSendTextMessageWithCC() throws {
-        let application = Application()
+    func testSendTextMessageWithCC() async throws {
+        let application = try await Application.make(.testing)
         defer {
-            application.shutdown()
+            Task {
+                try? await application.asyncShutdown()
+            }
         }
 
         application.smtp.configuration = smtpConfiguration
@@ -212,19 +214,19 @@ final class SmtpTests: XCTestCase {
                           body: "This is email body.")
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.smtp.send(email) { message in
+        try await request.smtp.send(email, logHandler: { message in
             print(message)
-        }.flatMapThrowing { result in
-            XCTAssertTrue(try result.get())
-        }.wait()
+        })
         
         sleep(3)
     }
 
-    func testSendTextMessageWithReplyTo() throws {
-        let application = Application()
+    func testSendTextMessageWithReplyTo() async throws {
+        let application = try await Application.make(.testing)
         defer {
-            application.shutdown()
+            Task {
+                try? await application.asyncShutdown()
+            }
         }
 
         application.smtp.configuration = smtpConfiguration
@@ -235,19 +237,19 @@ final class SmtpTests: XCTestCase {
                           replyTo: EmailAddress(address: "noreply@testxx.com"))
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.smtp.send(email) { message in
+        try await request.smtp.send(email, logHandler: { message in
             print(message)
-        }.flatMapThrowing { result in
-            XCTAssertTrue(try result.get())
-        }.wait()
+        })
         
         sleep(3)
     }
 
-    func testSendTextMessageOverSSL() throws {
-        let application = Application()
+    func testSendTextMessageOverSSL() async throws {
+        let application = try await Application.make(.testing)
         defer {
-            application.shutdown()
+            Task {
+                try? await application.asyncShutdown()
+            }
         }
         
         application.smtp.configuration = sslSmtpConfiguration
@@ -260,17 +262,17 @@ final class SmtpTests: XCTestCase {
         email.addAttachment(Attachment(name: "image.png", contentType: "image/png", data: Attachments.image()))
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.smtp.send(email) { message in
+        try await request.smtp.send(email, logHandler: { message in
             print(message)
-        }.flatMapThrowing { result in
-            XCTAssertTrue(try result.get())
-        }.wait()
+        })
     }
 
-    func testSendTextMessageOverTSL() throws {
-        let application = Application()
+    func testSendTextMessageOverTSL() async throws {
+        let application = try await Application.make(.testing)
         defer {
-            application.shutdown()
+            Task {
+                try? await application.asyncShutdown()
+            }
         }
 
         application.smtp.configuration = tslSmtpConfiguration
@@ -283,17 +285,17 @@ final class SmtpTests: XCTestCase {
         email.addAttachment(Attachment(name: "image.png", contentType: "image/png", data: Attachments.image()))
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.smtp.send(email) { message in
+        try await request.smtp.send(email, logHandler: { message in
             print(message)
-        }.flatMapThrowing { result in
-            XCTAssertTrue(try result.get())
-        }.wait()
+        })
     }
     
-    func testSendBccTextMessage() throws {
-        let application = Application()
+    func testSendBccTextMessage() async throws {
+        let application = try await Application.make(.testing)
         defer {
-            application.shutdown()
+            Task {
+                try? await application.asyncShutdown()
+            }
         }
 
         application.smtp.configuration = smtpConfiguration
@@ -305,19 +307,19 @@ final class SmtpTests: XCTestCase {
                           body: "This is email body.")
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.smtp.send(email) { message in
+        try await request.smtp.send(email, logHandler: { message in
             print(message)
-        }.flatMapThrowing { result in
-            XCTAssertTrue(try result.get())
-        }.wait()
+        })
 
         sleep(3)
     }
     
-    func testSendInReplyToTextMessage() throws {
-        let application = Application()
+    func testSendInReplyToTextMessage() async throws {
+        let application = try await Application.make(.testing)
         defer {
-            application.shutdown()
+            Task {
+                try? await application.asyncShutdown()
+            }
         }
 
         application.smtp.configuration = smtpConfiguration
@@ -329,19 +331,19 @@ final class SmtpTests: XCTestCase {
         )
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.smtp.send(email) { message in
+        try await request.smtp.send(email, logHandler: { message in
             print(message)
-        }.flatMapThrowing { result in
-            XCTAssertTrue(try result.get())
-        }.wait()
+        })
 
         sleep(3)
     }
     
-    func testSendOnlyBccTextMessage() throws {
-        let application = Application()
+    func testSendOnlyBccTextMessage() async throws {
+        let application = try await Application.make(.testing)
         defer {
-            application.shutdown()
+            Task {
+                try? await application.asyncShutdown()
+            }
         }
 
         application.smtp.configuration = smtpConfiguration
@@ -351,11 +353,9 @@ final class SmtpTests: XCTestCase {
                                body: "This is email body.")
 
         let request = Request(application: application, on: application.eventLoopGroup.next())
-        try request.smtp.send(email) { message in
+        try await request.smtp.send(email, logHandler: { message in
             print(message)
-        }.flatMapThrowing { result in
-            XCTAssertTrue(try result.get())
-        }.wait()
+        })
 
         sleep(3)
     }
@@ -371,32 +371,4 @@ final class SmtpTests: XCTestCase {
             XCTAssertEqual(error as! EmailError, EmailError.recipientNotSpecified)
         }
     }
-    
-#if compiler(>=5.5) && canImport(_Concurrency)
-
-    @available(macOS 12, iOS 15, watchOS 8, tvOS 15, *)
-    func testSendTextMessageWithAwaitFunction() async {
-        let application = Application()
-        defer {
-            application.shutdown()
-        }
-
-        application.smtp.configuration = smtpConfiguration
-        let email = try! Email(from: EmailAddress(address: "john.doe@testxx.com", name: "John Doe"),
-                          to: [EmailAddress(address: "ben.doe@testxx.com", name: "Ben Doe")],
-                          subject: "The subject (text) - \(timestamp)",
-                          body: "This is email body.")
-        
-        let request = Request(application: application, on: application.eventLoopGroup.next())
-        do {
-            try await request.smtp.send(email)
-        }
-        catch {
-            XCTFail("Error during send email")
-        }
-
-        sleep(3)
-    }
-
-#endif
 }
