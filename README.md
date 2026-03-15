@@ -53,7 +53,7 @@ try LoggingSystem.bootstrap(from: &env)
 let app = Application(env)
 defer { app.shutdown() }
 
-app.smtp.configuration.host = "smtp.server"
+app.smtp.configuration.hostname = "smtp.server"
 app.smtp.configuration.signInMethod = .credentials(username: "johndoe", password: "passw0rd")
 app.smtp.configuration.secure = .ssl
 

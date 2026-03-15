@@ -76,10 +76,10 @@ internal final class StartTlsHandler: ChannelDuplexHandler, RemovableChannelHand
         do {
             let sslContext = try NIOSSLContext(configuration: .makeClientConfiguration())
             let sslHandler = try NIOSSLClientHandler(context: sslContext, serverHostname: self.serverConfiguration.hostname)
-            _ = context.channel.pipeline.addHandler(sslHandler, name: "NIOSSLClientHandler", position: .first)
+            try context.channel.pipeline.syncOperations.addHandler(sslHandler, name: "NIOSSLClientHandler", position: .first)
 
             context.fireChannelRead(data)
-            _ = context.channel.pipeline.removeHandler(self)
+            context.channel.pipeline.syncOperations.removeHandler(self, promise: nil)
         } catch let error {
             self.allDonePromise.fail(error)
         }

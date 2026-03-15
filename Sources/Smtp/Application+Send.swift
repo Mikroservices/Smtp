@@ -25,7 +25,7 @@ import Vapor
 /// let app = Application(env)
 /// defer { app.shutdown() }
 ///
-/// app.smtp.configuration.host = "smtp.server"
+/// app.smtp.configuration.hostname = "smtp.server"
 /// app.smtp.configuration.username = "johndoe"
 /// app.smtp.configuration.password = "passw0rd"
 /// app.smtp.configuration.secure = .ssl
@@ -111,7 +111,7 @@ public extension Application.Smtp {
     ///     - eventLoop: Event lopp which will be used to send email (if nil then event loop from application will be created).
     ///     - logHandler: Callback which can be used for logging/printing of sending status messages.
     /// - returns: An `EventLoopFuture<Result<Bool, Error>>` with information about sent email.
-    func send(_ email: Email, eventLoop: EventLoop? = nil, logHandler: ((String) -> Void)? = nil) -> EventLoopFuture<Result<Bool, Error>> {
+    func send(_ email: Email, eventLoop: EventLoop? = nil, logHandler: (@Sendable (String) -> Void)? = nil) -> EventLoopFuture<Result<Bool, Error>> {
         
         let smtpEventLoop = eventLoop ?? self.application.eventLoopGroup
         let emailSentPromise: EventLoopPromise<Void> = smtpEventLoop.next().makePromise()
@@ -137,8 +137,12 @@ public extension Application.Smtp {
                                                 email: email,
                                                 allDonePromise: emailSentPromise)
                     ]
-
-                    return channel.pipeline.addHandlers(defaultHandlers, position: .last)
+                    do {
+                        try channel.pipeline.syncOperations.addHandlers(defaultHandlers, position: .last)
+                        return channel.eventLoop.makeSucceededFuture(())
+                    } catch {
+                        return channel.eventLoop.makeFailedFuture(error)
+                    }
                 }
             }
 
@@ -160,7 +164,7 @@ public extension Application.Smtp {
 
 @available(macOS 12, iOS 15, watchOS 8, tvOS 15, *)
 public extension Application.Smtp {
-    func send(_ email: Email, eventLoop: EventLoop? = nil, logHandler: ((String) -> Void)? = nil) async throws {
+    func send(_ email: Email, eventLoop: EventLoop? = nil, logHandler: (@Sendable (String) -> Void)? = nil) async throws {
         let result = try await self.send(email, eventLoop: eventLoop, logHandler: logHandler).get()
 
         switch result {

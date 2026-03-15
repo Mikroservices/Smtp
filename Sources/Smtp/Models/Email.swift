@@ -7,7 +7,7 @@
 import Foundation
 import NIO
 
-public struct Email {
+public struct Email: Sendable {
     public let from: EmailAddress
     public let to: [EmailAddress]?
     public let cc: [EmailAddress]?

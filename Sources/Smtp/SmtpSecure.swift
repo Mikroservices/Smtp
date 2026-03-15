@@ -33,7 +33,8 @@ public enum SmtpSecureChannel: Sendable {
             do {
                 let sslContext = try NIOSSLContext(configuration: .makeClientConfiguration())
                 let sslHandler = try NIOSSLClientHandler(context: sslContext, serverHostname: hostname)
-                return channel.pipeline.addHandler(sslHandler)
+                try channel.pipeline.syncOperations.addHandler(sslHandler, position: .last)
+                return channel.eventLoop.makeSucceededFuture(())
             } catch {
                 return channel.eventLoop.makeSucceededFuture(())
             }

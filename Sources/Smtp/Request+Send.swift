@@ -17,7 +17,7 @@ public extension Request {
     struct Smtp {
         let request: Request
 
-        public func send(_ email: Email, logHandler: ((String) -> Void)? = nil) -> EventLoopFuture<Result<Bool, Error>> {
+        public func send(_ email: Email, logHandler: (@Sendable (String) -> Void)? = nil) -> EventLoopFuture<Result<Bool, Error>> {
             return self.request.application.smtp.send(email, eventLoop: self.request.eventLoop, logHandler: logHandler)
         }
     }
@@ -27,7 +27,7 @@ public extension Request {
 
 @available(macOS 12, iOS 15, watchOS 8, tvOS 15, *)
 public extension Request.Smtp {
-    func send(_ email: Email, logHandler: ((String) -> Void)? = nil) async throws {
+    func send(_ email: Email, logHandler: (@Sendable (String) -> Void)? = nil) async throws {
         return try await self.request.application.smtp.send(email, eventLoop: self.request.eventLoop, logHandler: logHandler)
     }
 }

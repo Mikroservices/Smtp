@@ -12,9 +12,9 @@ internal final class DuplexMessagesHandler: ChannelDuplexHandler {
     typealias OutboundIn = ByteBuffer
     typealias OutboundOut = ByteBuffer
 
-    private let handler: ((String) -> Void)?
+    private let handler: (@Sendable (String) -> Void)?
 
-    init(handler: ((String) -> Void)? = nil) {
+    init(handler: (@Sendable (String) -> Void)? = nil) {
         self.handler = handler
     }
 
